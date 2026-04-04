@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | My Deals</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 40px; }
+        
+        .header-area { max-width: 1100px; margin: 0 auto 40px auto; display: flex; justify-content: space-between; align-items: center; }
+        h1 { color: #00e5ff; margin: 0; font-size: 32px; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1100px; margin: 0 auto; }
+        
+        .section-card { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .section-card h2 { font-size: 18px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        
+        .deal-item { background: #111; border: 1px solid #222; padding: 20px; border-radius: 12px; margin-bottom: 15px; transition: 0.3s; position: relative; overflow: hidden; }
+        .deal-item:hover { border-color: #00e5ff; transform: translateY(-3px); background: #161616; }
+        
+        .item-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; color: #fff; }
+        .item-meta { font-size: 13px; color: #888; margin-bottom: 15px; }
+        .price { color: #00e5ff; font-weight: bold; }
+
+        .chat-btn { display: inline-block; width: 100%; padding: 12px; text-align: center; background: linear-gradient(45deg, #00e5ff, #0077ff); color: #000; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase; transition: 0.3s; box-sizing: border-box; }
+        .chat-btn:hover { box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transform: scale(1.02); }
+
+        .back-btn { color: #888; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #333; padding: 8px 16px; border-radius: 6px; transition: 0.3s; }
+        .back-btn:hover { color: #fff; border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); }
+
+        .empty-state { text-align: center; padding: 40px 0; color: #444; font-style: italic; font-size: 14px; }
+
+        @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="header-area">
+        <h1>Active Deals</h1>
+        <a href="/dashboard.html" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="grid">
+        <div class="section-card">
+            <h2 style="color: #00e5ff;">🛒 Items I'm Buying</h2>
+            {% for deal in buying %}
+            <div class="deal-item">
+                <div class="item-title">{{ deal.title }}</div>
+                <div class="item-meta">Seller: <span style="color: #ccc;">{{ deal.other_party }}</span> | Price: <span class="price">₹{{ deal.selling_price }}</span></div>
+                <a href="/chat/{{ deal.tx_id }}" class="chat-btn">Open Chat Room</a>
+            </div>
+            {% else %}
+            <div class="empty-state">No active purchase requests.</div>
+            {% endfor %}
+        </div>
+
+        <div class="section-card">
+            <h2 style="color: #b000ff;">📦 Items I'm Selling</h2>
+            {% for deal in selling %}
+            <div class="deal-item">
+                <div class="item-title">{{ deal.title }}</div>
+                <div class="item-meta">Buyer: <span style="color: #ccc;">{{ deal.other_party }}</span> | Price: <span class="price">₹{{ deal.selling_price }}</span></div>
+                <a href="/chat/{{ deal.tx_id }}" class="chat-btn" style="background: linear-gradient(45deg, #b000ff, #7000ff); color: #fff;">Open Chat Room</a>
+            </div>
+            {% else %}
+            <div class="empty-state">No buyers have requested your items yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>

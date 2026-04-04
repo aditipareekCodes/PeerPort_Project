@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | Dashboard</title>
+    <style>
+        /* Global Dark Theme */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Animated Background Orbs --- */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.3;
+            animation: float 10s infinite alternate ease-in-out;
+        }
+        .orb-cyan { width: 400px; height: 400px; background: #00e5ff; top: 10%; left: -5%; }
+        .orb-purple { width: 350px; height: 350px; background: #b000ff; bottom: 5%; right: -5%; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* --- Glassmorphism Navbar --- */
+        .navbar {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-box h1 {
+            margin: 0; font-size: 24px;
+            background: linear-gradient(90deg, #00e5ff, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-box p { margin: 2px 0 0 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .user-controls {
+            display: flex; align-items: center; gap: 20px;
+        }
+        .welcome-text { font-size: 16px; color: #ccc; }
+        .welcome-text strong { color: #fff; font-weight: 600; }
+        
+        .logout-btn {
+            background: rgba(255, 51, 102, 0.1); color: #ff3366;
+            border: 1px solid rgba(255, 51, 102, 0.3); padding: 8px 16px;
+            border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: bold;
+        }
+        .logout-btn:hover { background: #ff3366; color: white; box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); }
+
+        /* --- Main Centered Grid --- */
+        .container {
+            max-width: 1000px; margin: 60px auto; padding: 0 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(25, 25, 25, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; padding: 30px; text-align: center;
+            cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden;
+        }
+        
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--neon-color); opacity: 0.5; transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px); border-color: var(--neon-color);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px var(--neon-glow);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .icon-circle {
+            width: 60px; height: 60px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 28px; margin: 0 auto 15px auto; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s;
+        }
+        .card:hover .icon-circle {
+            background: var(--neon-glow); border-color: var(--neon-color); transform: scale(1.1);
+        }
+
+        .card h3 { margin: 0 0 10px 0; font-size: 20px; color: #fff; }
+        .card p { margin: 0; font-size: 13px; color: #888; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-cyan"></div>
+    <div class="orb orb-purple"></div>
+
+    <nav class="navbar">
+        <div class="logo-box">
+            <h1>PeerPort</h1>
+            <p>Resale Platform For Students</p>
+        </div>
+        <div class="user-controls">
+            <span class="welcome-text">Welcome, <strong>{{ user_name }}</strong></span>
+            
+            <a href="/settings.html" style="color: #ccc; text-decoration: none; font-size: 22px; transition: transform 0.3s ease, color 0.3s ease; display: inline-block;" onmouseover="this.style.transform='rotate(45deg)'; this.style.color='#fdd835';" onmouseout="this.style.transform='rotate(0deg)'; this.style.color='#ccc';" title="Account Settings">
+                ⚙️
+            </a>
+
+            <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="grid">
+            <div class="card" style="--neon-color: #0088ff; --neon-glow: rgba(0, 136, 255, 0.3);" onclick="window.location.href='/buy.html'">
+                <div class="icon-circle">🛒</div>
+                <h3>Buy Products</h3>
+                <p>Browse available textbooks and tools</p>
+            </div>
+            
+            <div class="card" style="--neon-color: #00e676; --neon-glow: rgba(0, 230, 118, 0.3);" onclick="window.location.href='/sell.html'">
+                <div class="icon-circle">📦</div>
+                <h3>Sell Product</h3>
+                <p>List your unused items for sale</p>
+            </div>
+
+            <div class="card" style="--neon-color: #b000ff; --neon-glow: rgba(176, 0, 255, 0.3);" onclick="window.location.href='/purchases.html'">
+                <div class="icon-circle">🧾</div>
+                <h3>My Purchases</h3>
+                <p>View your transaction history & listings</p>
+            </div>
+
+            <div class="card" style="--neon-color: #ff6b00; --neon-glow: rgba(255, 107, 0, 0.3);" onclick="window.location.href='/faqs.html'">
+                <div class="icon-circle">❓</div>
+                <h3>FAQs</h3>
+                <p>Get answers on meetups and safety</p>
+            </div>
+
+            <div class="card" style="--neon-color: #5c6bc0; --neon-glow: rgba(92, 107, 192, 0.3);" onclick="window.location.href='/about.html'">
+                <div class="icon-circle">ℹ️</div>
+                <h3>About Us</h3>
+                <p>Learn about PeerPort & Team SE B 16</p>
+            </div>
+
+            <div class="card" style="--neon-color: #ff3366; --neon-glow: rgba(255, 51, 102, 0.3);" onclick="window.location.href='/contact.html'">
+                <div class="icon-circle">✉️</div>
+                <h3>Contact Us</h3>
+                <p>Report bugs or contact the admins</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

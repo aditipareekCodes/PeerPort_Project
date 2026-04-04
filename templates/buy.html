@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | Marketplace</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 40px; }
+        h1 { color: #00e5ff; margin-bottom: 20px; font-size: 36px; text-transform: uppercase; letter-spacing: 2px;}
+        .filter-bar { background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(0, 229, 255, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 30px; }
+        .filter-input { padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid #333; color: white; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 20px; transition: 0.3s; display: flex; flex-direction: column; }
+        .card:hover { transform: translateY(-5px); border-color: #00e5ff; }
+        .main-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; background: #000; }
+        .title { font-size: 18px; margin: 0 0 10px 0; color: #fff; height: 45px; overflow: hidden; }
+        .price-tag { color: #00e5ff; font-weight: bold; font-size: 22px; }
+        .badge { background: #222; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #aaa; border: 1px solid #333; margin-right: 5px; }
+        .btn { display: block; padding: 12px; background: transparent; color: #00e5ff; font-weight: bold; text-decoration: none; border-radius: 8px; text-align: center; border: 1px solid #00e5ff; margin-top: auto; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
+        .btn:hover { background: rgba(0, 229, 255, 0.1); box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2); }
+        .back-nav a { color: #888; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <div class="back-nav" style="margin-bottom: 30px;"><a href="/dashboard.html">← Dashboard</a></div>
+    <h1>🌐 Campus Marketplace</h1>
+    <div class="filter-bar">
+        <form action="/buy.html" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 200px;"><input type="text" name="search" class="filter-input" placeholder="Search assets..." value="{{ search }}"></div>
+            <div style="flex: 1;"><select name="category" class="filter-input">
+                <option value="All" {% if current_category == 'All' %}selected{% endif %}>All Depts</option>
+                <option value="IT" {% if current_category == 'IT' %}selected{% endif %}>IT</option>
+                <option value="CS" {% if current_category == 'CS' %}selected{% endif %}>CS</option>
+                <option value="Mech" {% if current_category == 'Mech' %}selected{% endif %}>Mech</option>
+                <option value="Civil" {% if current_category == 'Civil' %}selected{% endif %}>Civil</option>
+                <option value="DS" {% if current_category == 'DS' %}selected{% endif %}>DS</option>
+                <option value="AIML" {% if current_category == 'AIML' %}selected{% endif %}>AIML</option>
+            </select></div>
+            <div style="flex: 1;"><select name="semester" class="filter-input">
+                <option value="Any" {% if current_semester == 'Any' %}selected{% endif %}>Any Sem</option>
+                {% for i in range(1, 9) %}<option value="Sem {{i}}" {% if current_semester == 'Sem ' ~ i %}selected{% endif %}>Sem {{i}}</option>{% endfor %}
+            </select></div>
+            <button type="submit" style="padding: 12px 25px; background: #00e5ff; color: black; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;">FILTER</button>
+        </form>
+    </div>
+    <div class="grid">
+        {% for item in items %}
+        <div class="card">
+            {% set images = item.image_file.split(',') %}
+            <img src="{{ url_for('static', filename='uploads/' + images[0]) }}" class="main-img" onerror="this.src='https://via.placeholder.com/300x180/111/00e5ff?text=No+Image'">
+            <h3 class="title">{{ item.title }}</h3>
+            <div style="margin-bottom: 15px;"><span class="price-tag">₹{{ item.selling_price }}</span></div>
+            <div style="margin-bottom: 15px;"><span class="badge">{{ item.category }}</span><span class="badge">{{ item.semester }}</span></div>
+            <a href="/item/{{ item.item_id }}" class="btn">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

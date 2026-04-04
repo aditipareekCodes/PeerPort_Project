@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | Contact Us</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: #ffffff; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.3; animation: float 10s infinite alternate ease-in-out; }
+        .orb-cyan { width: 350px; height: 350px; background: #00e5ff; top: 10%; left: -5%; }
+        .orb-pink { width: 400px; height: 400px; background: #ff3366; bottom: 5%; right: -5%; animation-delay: -3s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.1); } }
+
+        .navbar { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box h1 { margin: 0; font-size: 24px; background: linear-gradient(90deg, #00e5ff, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-box p { margin: 2px 0 0 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;}
+        .back-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: 0.3s; text-decoration: none; font-size: 14px; }
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .form-container { max-width: 500px; margin: 40px auto; background: rgba(25, 25, 25, 0.6); backdrop-filter: blur(15px); padding: 40px; border-radius: 16px; border: 1px solid rgba(255, 51, 102, 0.2); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8); }
+        .form-container h2 { margin-top: 0; margin-bottom: 10px; color: #ff3366; text-shadow: 0 0 15px rgba(255, 51, 102, 0.3); }
+        .form-container p { color: #aaa; font-size: 14px; margin-bottom: 25px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; color: #b3b3b3; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input, select, textarea { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; font-size: 15px; transition: all 0.3s; font-family: inherit;}
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.3), inset 0 2px 5px rgba(0,0,0,0.5); }
+        textarea { resize: vertical; min-height: 100px; }
+
+        .submit-btn { width: 100%; padding: 14px; font-size: 16px; font-weight: bold; background: linear-gradient(45deg, #ff0055, #ff3366); color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4); margin-top: 10px;}
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 51, 102, 0.6); }
+
+        /* The Custom Success Box */
+        .success-box { background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88; color: #00ff88; padding: 25px; text-align: center; border-radius: 12px; margin-top: 20px; }
+        .success-box h3 { margin-top: 0; }
+        .btn-home { display: inline-block; margin-top: 15px; padding: 10px 20px; background: #00ff88; color: #000; text-decoration: none; font-weight: bold; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-cyan"></div>
+    <div class="orb orb-pink"></div>
+
+    <nav class="navbar">
+        <div class="logo-box">
+            <h1>PeerPort</h1>
+            <p>Resale Platform For Students</p>
+        </div>
+        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    </nav>
+
+    <div class="form-container">
+        <h2>Get in Touch</h2>
+        <p>Found a bug or need help with a transaction? Drop us a message.</p>
+        
+        {% if success %}
+            <div class="success-box">
+                <h3>✅ Ticket Submitted!</h3>
+                <p style="color: #aaa;">Your message has been securely routed to the Admin team. We will contact you via your college email soon.</p>
+                <a href="/dashboard.html" class="btn-home">Return to Dashboard</a>
+            </div>
+        {% else %}
+            <form action="/contact.html" method="POST">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" name="name" placeholder="e.g. Aditi Pareek" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>College Email</label>
+                    <input type="email" name="email" placeholder="e.g. 24104027@apsit.edu.in" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Issue Type</label>
+                    <select name="subject" required>
+                        <option value="" disabled selected>Select an option...</option>
+                        <option value="Bug Report">Report a Platform Bug</option>
+                        <option value="Suspicious User">Report Suspicious User</option>
+                        <option value="Feature Request">Feature Suggestion</option>
+                        <option value="Other">Other Inquiry</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Message Details</label>
+                    <textarea name="message" placeholder="Describe your issue here..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        {% endif %}
+    </div>
+
+</body>
+</html>

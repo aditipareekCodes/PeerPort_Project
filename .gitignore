@@ -1,0 +1,5 @@
+static/uploads/*
+!static/uploads/default_avatar.png
+peerport.db
+__pycache__/
+.venv/

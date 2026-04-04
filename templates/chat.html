@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | Secure Deal Room</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; box-sizing: border-box; }
+        
+        .chat-container { width: 100%; max-width: 600px; height: 90vh; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden; }
+        
+        .chat-header { background: rgba(0, 0, 0, 0.6); padding: 20px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+        .chat-header h2 { margin: 0; color: #00e5ff; font-size: 20px; }
+        .back-btn { color: #888; text-decoration: none; font-size: 13px; font-weight: bold; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid #333; transition: 0.3s; }
+        .back-btn:hover { color: #fff; border-color: #00e5ff; }
+
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .chat-box::-webkit-scrollbar { width: 6px; }
+        .chat-box::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        .message-wrapper { display: flex; gap: 10px; max-width: 80%; }
+        .wrapper-mine { align-self: flex-end; flex-direction: row-reverse; }
+        .wrapper-theirs { align-self: flex-start; }
+
+        .avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #333; }
+        
+        .message { padding: 12px 16px; border-radius: 16px; font-size: 14.5px; line-height: 1.4; word-wrap: break-word;}
+        .msg-mine { background: linear-gradient(45deg, #00e5ff, #0077ff); color: black; font-weight: 500; border-bottom-right-radius: 4px; }
+        .msg-theirs { background: #222; color: white; border: 1px solid #333; border-bottom-left-radius: 4px; }
+
+        .input-area { padding: 15px 20px; background: rgba(0, 0, 0, 0.6); border-top: 1px solid #333; display: flex; gap: 10px; }
+        .input-area input { flex: 1; padding: 14px; background: #111; border: 1px solid #333; color: white; border-radius: 25px; font-size: 15px; outline: none; transition: 0.3s; }
+        .input-area input:focus { border-color: #00e5ff; }
+        .input-area button { background: #00e5ff; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; transition: 0.3s; }
+        .input-area button:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Secure Deal Room #{{ tx_id }}</h2>
+            <a href="/purchases.html" class="back-btn">Exit Room</a>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <div style="text-align: center; color: #666; font-size: 12px; margin-top: 20px;">Establishing secure connection...</div>
+        </div>
+
+        <form class="input-area" id="chat-form">
+            <input type="text" id="msg-input" placeholder="Type a message..." autocomplete="off" required>
+            <button type="submit">➤</button>
+        </form>
+    </div>
+
+    <script>
+        const txId = {{ tx_id }};
+        const currentUser = "{{ current_user }}";
+        const chatBox = document.getElementById('chat-box');
+        let lastMessageCount = 0;
+
+        // THE MAGIC TRICK: Pull new messages from the server
+        async function fetchMessages() {
+            const response = await fetch(`/api/chat/${txId}`);
+            const data = await response.json();
+            
+            // Only update the screen if someone sent a new text
+            if (data.messages.length > lastMessageCount) {
+                chatBox.innerHTML = ''; // Clear loading text
+                
+                data.messages.forEach(msg => {
+                    const isMine = msg.sender_id === currentUser;
+                    const wrapperClass = isMine ? 'wrapper-mine' : 'wrapper-theirs';
+                    const msgClass = isMine ? 'msg-mine' : 'msg-theirs';
+                    
+                    const html = `
+                        <div class="message-wrapper ${wrapperClass}">
+                            <img src="/static/uploads/${msg.profile_pic}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${msg.full_name}&background=333&color=fff'">
+                            <div class="message ${msgClass}">${msg.message}</div>
+                        </div>
+                    `;
+                    chatBox.innerHTML += html;
+                });
+                
+                lastMessageCount = data.messages.length;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            }
+        }
+
+        // Send a new message without refreshing the page
+        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('msg-input');
+            const messageText = input.value;
+            input.value = ''; // Clear text box instantly
+            
+            // Send to Python in the background
+            await fetch(`/chat/${txId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ message: messageText })
+            });
+            
+            fetchMessages(); // Instantly reload chat
+        });
+
+        // The heartbeat: Run fetchMessages every 2 seconds
+        setInterval(fetchMessages, 2000);
+        fetchMessages(); // Run once immediately on load
+    </script>
+
+</body>
+</html>

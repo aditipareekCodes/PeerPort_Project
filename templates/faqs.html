@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | FAQs</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: #ffffff; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.3; animation: float 10s infinite alternate ease-in-out; }
+        .orb-cyan { width: 350px; height: 350px; background: #00e5ff; top: 10%; left: -5%; }
+        .orb-orange { width: 400px; height: 400px; background: #ff6b00; bottom: 5%; right: -5%; animation-delay: -3s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.1); } }
+
+        .navbar { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-box h1 { margin: 0; font-size: 24px; background: linear-gradient(90deg, #00e5ff, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-box p { margin: 2px 0 0 0; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;}
+        .back-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: 0.3s; text-decoration: none; font-size: 14px; }
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .page-title { font-size: 32px; margin-bottom: 30px; font-weight: 600; color: #ff8c00; text-shadow: 0 0 15px rgba(255, 140, 0, 0.3); text-align: center;}
+
+        /* Accordion Styles */
+        .faq-item { background: rgba(25, 25, 25, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; overflow: hidden; transition: 0.3s; }
+        .faq-item:hover { border-color: rgba(255, 107, 0, 0.4); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
+        .faq-question { padding: 20px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: transparent; border: none; color: white; width: 100%; text-align: left; transition: 0.3s; }
+        .faq-question:hover { color: #ff8c00; }
+        .arrow { transition: transform 0.3s; color: #ff8c00; font-weight: bold; }
+        
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; background: rgba(0,0,0,0.3); font-size: 15px; color: #ccc; line-height: 1.6; padding: 0 20px; }
+        
+        /* Active State */
+        .faq-item.active .faq-answer { max-height: 200px; padding: 0 20px 20px 20px; }
+        .faq-item.active .arrow { transform: rotate(180deg); }
+        .faq-item.active { border-color: #ff6b00; box-shadow: 0 0 15px rgba(255, 107, 0, 0.2); }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-cyan"></div>
+    <div class="orb orb-orange"></div>
+
+    <nav class="navbar">
+        <div class="logo-box">
+            <h1>PeerPort</h1>
+            <p>Resale Platform For Students</p>
+        </div>
+        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <h2 class="page-title">Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">How do I buy a product? <span class="arrow">▼</span></button>
+            <div class="faq-answer"><br>Navigate to the "Buy Products" section, use the smart filters to find items for your specific branch and semester. Click "Request to Buy" to lock the item and open a chat with the seller.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">How do I sell a product? <span class="arrow">▼</span></button>
+            <div class="faq-answer"><br>Go to the "Sell Product" tab. Upload a clear picture of your textbook or tool, set your price, select the condition, and post it. It will instantly appear on the marketplace feed.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">What payment methods are accepted? <span class="arrow">▼</span></button>
+            <div class="faq-answer"><br>PeerPort does not handle digital payments to prevent fraud. All transactions are settled offline via Cash or UPI (GPay/PhonePe) when you meet the buyer/seller on campus.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">How do I contact the seller? <span class="arrow">▼</span></button>
+            <div class="faq-answer"><br>Once you request an item, our built-in Secure Chat opens. You can message the seller there to decide on a meetup spot (like the APSIT Canteen or Library).</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">Can I cancel a purchase? <span class="arrow">▼</span></button>
+            <div class="faq-answer"><br>Yes. If you haven't completed the physical handover yet, you can go to your "My Purchases" tab or the Chat interface and click "Cancel Deal". The item will be returned to the main feed.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">Is my personal information safe? <span class="arrow">▼</span></button>
+            <div class="faq-answer"><br>Absolutely. We only allow verified @apsit.edu.in emails. Furthermore, your phone number is never shared; all communication happens through our encrypted in-app chat.</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFAQ(element) {
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if(item !== element.parentElement) item.classList.remove('active');
+            });
+            // Toggle the clicked one
+            element.parentElement.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

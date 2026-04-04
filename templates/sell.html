@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerPort | Deploy Asset</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #050505; color: white; padding: 40px; display: flex; justify-content: center; }
+        .form-container { width: 100%; max-width: 600px; background: #111; padding: 40px; border-radius: 16px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: #00e5ff; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 13px; color: #888; text-transform: uppercase; }
+        input, textarea, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #00e5ff; outline: none; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn { width: 100%; padding: 15px; background: linear-gradient(45deg, #00e5ff, #0077ff); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 20px; transition: 0.3s; }
+        .btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+        .back-nav { margin-bottom: 20px; text-align: left; }
+        .back-nav a { color: #888; text-decoration: none; font-size: 12px; border: 1px solid #333; padding: 6px 12px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="back-nav"><a href="/dashboard.html">← Back</a></div>
+        <h2>Deploy New Asset</h2>
+        <form action="/sell.html" method="POST" enctype="multipart/form-data">
+            <div class="form-group"><label>Asset Title</label><input type="text" name="title" placeholder="e.g. Draughting Board / Python Book" required></div>
+            <div class="form-group"><label>Description</label><textarea name="description" rows="3" placeholder="Condition, age, contents..." required></textarea></div>
+            <div class="grid-2">
+                <div class="form-group"><label>Original Price (₹)</label><input type="number" name="original_price" placeholder="MRP"></div>
+                <div class="form-group"><label>Selling Price (₹)</label><input type="number" name="price" placeholder="Your Price" required></div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group"><label>Department</label><select name="category" required>
+                    <option value="IT">IT</option><option value="CS">CS</option><option value="Mech">Mech</option>
+                    <option value="Civil">Civil</option><option value="DS">DS</option><option value="AIML">AIML</option>
+                    <option value="General">General</option>
+                </select></div>
+                <div class="form-group"><label>Semester</label><select name="semester" required>
+                    {% for i in range(1, 9) %}<option value="Sem {{i}}">Semester {{i}}</option>{% endfor %}
+                </select></div>
+            </div>
+            <div class="form-group"><label>Condition</label><select name="condition"><option value="New">New / Unused</option><option value="Like New">Like New</option><option value="Used">Used / Functional</option></select></div>
+            <div class="form-group"><label>Upload Media (Max 5)</label><input type="file" name="images" multiple accept="image/*"></div>
+            <button type="submit" class="btn">Deploy to Marketplace</button>
+        </form>
+    </div>
+</body>
+</html>
