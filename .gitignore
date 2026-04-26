@@ -3,3 +3,6 @@ static/uploads/*
 peerport.db
 __pycache__/
 .venv/
+.env
+*.pyc
+ 

@@ -3,67 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeerPort | My Deals</title>
+    <title>PeerPort | My Active Deals</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 40px; }
         
         .header-area { max-width: 1100px; margin: 0 auto 40px auto; display: flex; justify-content: space-between; align-items: center; }
-        h1 { color: #00e5ff; margin: 0; font-size: 32px; text-transform: uppercase; letter-spacing: 2px; }
+        h1 { color: #00e5ff; margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1100px; margin: 0 auto; }
         
         .section-card { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .section-card h2 { font-size: 18px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        .section-card h2 { font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #333; }
         
-        .deal-item { background: #111; border: 1px solid #222; padding: 20px; border-radius: 12px; margin-bottom: 15px; transition: 0.3s; position: relative; overflow: hidden; }
-        .deal-item:hover { border-color: #00e5ff; transform: translateY(-3px); background: #161616; }
+        .deal-item { background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+        .deal-item:hover { border-color: #00e5ff; background: #161616; }
         
-        .item-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; color: #fff; }
-        .item-meta { font-size: 13px; color: #888; margin-bottom: 15px; }
+        .item-img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid #333; flex-shrink: 0; }
+        .item-info { flex-grow: 1; }
+        .item-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+        .item-meta { font-size: 13px; color: #888; margin-bottom: 10px; }
         .price { color: #00e5ff; font-weight: bold; }
 
-        .chat-btn { display: inline-block; width: 100%; padding: 12px; text-align: center; background: linear-gradient(45deg, #00e5ff, #0077ff); color: #000; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase; transition: 0.3s; box-sizing: border-box; }
-        .chat-btn:hover { box-shadow: 0 0 15px rgba(0, 229, 255, 0.4); transform: scale(1.02); }
+        .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: transparent; border: 1px solid #00e5ff; color: #00e5ff; text-transform: uppercase; }
+        .status-sold { border-color: #00ff88; color: #00ff88; }
 
-        .back-btn { color: #888; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #333; padding: 8px 16px; border-radius: 6px; transition: 0.3s; }
-        .back-btn:hover { color: #fff; border-color: #00e5ff; background: rgba(0, 229, 255, 0.05); }
+        .btn-group { display: flex; gap: 8px; }
+        .action-btn { padding: 8px 12px; text-align: center; border-radius: 6px; font-weight: bold; font-size: 11px; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; transition: 0.3s; }
+        
+        .btn-chat { background: #00e5ff; color: #000; }
+        .btn-cancel { background: rgba(255, 51, 102, 0.1); color: #ff3366; border: 1px solid #ff3366; }
+        .btn-sold { background: #00ff88; color: #000; }
+        
+        .back-btn { color: #00e5ff; text-decoration: none; font-size: 12px; font-weight: bold; text-transform: uppercase; border: 1px solid #00e5ff; padding: 10px 20px; border-radius: 8px; }
+        .back-btn:hover { background: rgba(0, 229, 255, 0.1); }
 
-        .empty-state { text-align: center; padding: 40px 0; color: #444; font-style: italic; font-size: 14px; }
-
-        @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } }
+        .empty-state { text-align: center; padding: 40px 0; color: #444; font-style: italic; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div class="header-area">
-        <h1>Active Deals</h1>
-        <a href="/dashboard.html" class="back-btn">← Dashboard</a>
+        <h1>My Active Deals</h1>
+        <a href="/dashboard.html" class="back-btn">Dashboard</a>
     </div>
 
     <div class="grid">
         <div class="section-card">
-            <h2 style="color: #00e5ff;">🛒 Items I'm Buying</h2>
+            <h2 style="color: #00e5ff;">🛒 Items I am Buying</h2>
             {% for deal in buying %}
             <div class="deal-item">
-                <div class="item-title">{{ deal.title }}</div>
-                <div class="item-meta">Seller: <span style="color: #ccc;">{{ deal.other_party }}</span> | Price: <span class="price">₹{{ deal.selling_price }}</span></div>
-                <a href="/chat/{{ deal.tx_id }}" class="chat-btn">Open Chat Room</a>
+                <img src="{{ url_for('static', filename='uploads/' + deal.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
+                <div class="item-info">
+                    <div class="item-title">
+                        {{ deal.title }} 
+                        <span class="status-badge {% if deal.status == 'Completed' %}status-sold{% endif %}">{{ deal.status }}</span>
+                    </div>
+                    <div class="item-meta">Seller: {{ deal.other_party }} | <span class="price">₹{{ deal.selling_price }}</span></div>
+                    
+                    <div class="btn-group">
+                        {% if deal.status != 'Completed' %}
+                            <a href="/chat/{{ deal.tx_id }}" class="action-btn btn-chat">Chat</a>
+                            <form action="/cancel_request/{{ deal.tx_id }}" method="POST" style="margin:0;">
+                                <button type="submit" class="action-btn btn-cancel">Cancel</button>
+                            </form>
+                        {% else %}
+                            <span style="color: #00ff88; font-size: 11px;">✔ ASSET RECEIVED</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             {% else %}
-            <div class="empty-state">No active purchase requests.</div>
+            <div class="empty-state">No items requested yet.</div>
             {% endfor %}
         </div>
 
         <div class="section-card">
-            <h2 style="color: #b000ff;">📦 Items I'm Selling</h2>
+            <h2 style="color: #b000ff;">📦 Items I am Selling</h2>
             {% for deal in selling %}
             <div class="deal-item">
-                <div class="item-title">{{ deal.title }}</div>
-                <div class="item-meta">Buyer: <span style="color: #ccc;">{{ deal.other_party }}</span> | Price: <span class="price">₹{{ deal.selling_price }}</span></div>
-                <a href="/chat/{{ deal.tx_id }}" class="chat-btn" style="background: linear-gradient(45deg, #b000ff, #7000ff); color: #fff;">Open Chat Room</a>
+                <img src="{{ url_for('static', filename='uploads/' + deal.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
+                <div class="item-info">
+                    <div class="item-title">
+                        {{ deal.title }} 
+                        <span class="status-badge" style="border-color:#b000ff; color:#b000ff;">{{ deal.status }}</span>
+                    </div>
+                    <div class="item-meta">Buyer: {{ deal.other_party }} | <span class="price" style="color:#b000ff;">₹{{ deal.selling_price }}</span></div>
+                    
+                    <div class="btn-group">
+                        {% if deal.status != 'Completed' %}
+                            <a href="/chat/{{ deal.tx_id }}" class="action-btn" style="background:#b000ff; color:white;">Chat</a>
+                            <form action="/complete_deal/{{ deal.tx_id }}" method="POST" style="margin:0;">
+                                <button type="submit" class="action-btn btn-sold">Mark Sold</button>
+                            </form>
+                        {% else %}
+                            <span style="color: #00ff88; font-size: 11px;">✔ ASSET SOLD</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             {% else %}
-            <div class="empty-state">No buyers have requested your items yet.</div>
+            <div class="empty-state">No one has requested your items yet.</div>
             {% endfor %}
         </div>
     </div>

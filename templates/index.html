@@ -3,246 +3,721 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeerPort | Welcome</title>
+    <title>PeerPort | Resale Platform For Students</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* Base Reset */
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            overflow-x: hidden; /* Only hide horizontal scroll, allow vertical */
-            scroll-behavior: smooth;
+        :root {
+            --cyan: #00e5ff;
+            --purple: #b000ff;
+            --orange: #ff6b00;
+            --pink: #ff2d78;
+            --bg: #060608;
+            --card: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.07);
         }
 
-        /* --- THE DYNAMIC BACKGROUND --- */
-        .bg-animated {
-            position: fixed; /* Fixed so it stays while you scroll */
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ========== NOISE OVERLAY ========== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* ========== ANIMATED MESH BACKGROUND ========== */
+        .mesh {
+            position: fixed;
+            inset: 0;
             z-index: -1;
-            background: linear-gradient(-45deg, #050505, #1a0b2e, #001233, #0f0514);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            overflow: hidden;
+        }
+        .mesh-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.18;
+            animation: drift linear infinite;
+        }
+        .blob1 { width: 700px; height: 700px; background: var(--cyan); top: -200px; left: -200px; animation-duration: 25s; }
+        .blob2 { width: 600px; height: 600px; background: var(--purple); top: 30%; right: -150px; animation-duration: 30s; animation-delay: -10s; }
+        .blob3 { width: 500px; height: 500px; background: var(--orange); bottom: -100px; left: 20%; animation-duration: 20s; animation-delay: -5s; }
+        .blob4 { width: 400px; height: 400px; background: var(--pink); top: 60%; left: 60%; animation-duration: 35s; animation-delay: -15s; }
+
+        @keyframes drift {
+            0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33%  { transform: translate(60px, 40px) scale(1.1) rotate(120deg); }
+            66%  { transform: translate(-40px, 80px) scale(0.95) rotate(240deg); }
+            100% { transform: translate(0, 0) scale(1) rotate(360deg); }
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* ========== NAVBAR ========== */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(6, 6, 8, 0.6);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
         }
+        .nav-logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        .nav-links { display: flex; gap: 10px; align-items: center; }
+        .nav-link {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .nav-cta {
+            background: linear-gradient(135deg, var(--cyan), #0077ff);
+            color: #000 !important;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 9px 22px;
+            font-size: 14px;
+        }
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(0,229,255,0.35); background: rgba(255,255,255,0.06) !important; color: #fff !important; }
 
-        /* --- HERO SECTION (Full Screen) --- */
-        .hero-section {
+        /* ========== HERO ========== */
+        .hero {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
+            padding: 120px 20px 60px;
             position: relative;
         }
 
-        .hero-content {
-            animation: fadeIn 1.5s ease-out;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,229,255,0.08);
+            border: 1px solid rgba(0,229,255,0.2);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 12px;
+            color: var(--cyan);
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            animation: fadeUp 0.8s ease both;
+        }
+        .badge-dot {
+            width: 6px; height: 6px;
+            background: var(--cyan);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3.5rem, 9vw, 7.5rem);
+            font-weight: 800;
+            line-height: 0.95;
+            letter-spacing: -2px;
+            margin-bottom: 28px;
+            animation: fadeUp 0.8s 0.1s ease both;
         }
-
-        .hero-content h1 {
-            font-size: 4.5rem;
-            margin: 0 0 10px 0;
-            background: linear-gradient(90deg, #00e5ff, #b000ff);
+        .hero h1 .line1 { display: block; color: #fff; }
+        .hero h1 .line2 {
+            display: block;
+            background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
+            animation: shimmer 4s linear infinite, fadeUp 0.8s 0.1s ease both;
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
 
-        .hero-content p {
-            font-size: 1.2rem;
-            color: #b3b3b3;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        /* --- BUTTONS --- */
-        .btn-group {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        button {
-            padding: 16px 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-login {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-login:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #00e5ff;
-            transform: translateY(-3px);
-        }
-
-        .btn-start {
-            background: linear-gradient(45deg, #00e5ff, #0077ff);
-            color: black;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
-        }
-
-        .btn-start:hover {
-            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.6);
-            transform: translateY(-3px);
-            color: white;
-        }
-
-        /* Scroll Indicator */
-        .scroll-down {
-            position: absolute;
-            bottom: 40px;
-            font-size: 24px;
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.2rem);
             color: rgba(255,255,255,0.5);
-            animation: bounce 2s infinite;
-            text-decoration: none;
-        }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-15px); }
-            60% { transform: translateY(-7px); }
+            max-width: 520px;
+            line-height: 1.7;
+            margin-bottom: 48px;
+            font-weight: 300;
+            animation: fadeUp 0.8s 0.2s ease both;
         }
 
-        /* --- INFO SECTION (Scroll down content) --- */
-        .info-section {
-            padding: 100px 20px;
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeUp 0.8s 0.3s ease both;
+        }
+        .btn-primary {
+            padding: 16px 36px;
+            background: linear-gradient(135deg, var(--cyan), #0077ff);
+            color: #000;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,229,255,0.4);
+        }
+        .btn-ghost {
+            padding: 16px 36px;
+            background: transparent;
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.4);
+            transform: translateY(-3px);
+        }
+
+        /* ========== STATS STRIP ========== */
+        .stats-strip {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.015);
+            animation: fadeUp 0.8s 0.4s ease both;
+        }
+        .stat { text-align: center; }
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        /* ========== HOW IT WORKS ========== */
+        .section {
+            padding: 120px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .section-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 60px;
+            letter-spacing: -1px;
+        }
+        .section-title span {
+            background: linear-gradient(90deg, var(--orange), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Steps */
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2px; }
+        .step {
+            padding: 40px 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            position: relative;
+            transition: all 0.4s;
+        }
+        .step:first-child { border-radius: 16px 0 0 16px; }
+        .step:last-child { border-radius: 0 16px 16px 0; }
+        .step:hover {
+            background: rgba(255,255,255,0.05);
+            z-index: 1;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .step-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.06);
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+        .step-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .step h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .step p { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+        .step-accent {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+            border-radius: 0 0 0 0;
+        }
+        .step:hover .step-accent { transform: scaleX(1); }
+
+        /* ========== FEATURES ========== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            padding: 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(0,229,255,0.06), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover {
+            border-color: rgba(0,229,255,0.2);
+            transform: translateY(-6px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+        }
+        .feature-icon-wrap {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .fi-cyan { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); }
+        .fi-purple { background: rgba(176,0,255,0.1); border: 1px solid rgba(176,0,255,0.2); }
+        .fi-orange { background: rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.2); }
+        .fi-pink { background: rgba(255,45,120,0.1); border: 1px solid rgba(255,45,120,0.2); }
+        .fi-green { background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.2); }
+        .fi-yellow { background: rgba(255,214,0,0.1); border: 1px solid rgba(255,214,0,0.2); }
+        .feature-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .feature-card p { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.65; }
+
+        /* ========== CATEGORIES ========== */
+        .categories {
+            padding: 80px 20px;
+            background: rgba(255,255,255,0.015);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .categories-inner { max-width: 1100px; margin: 0 auto; }
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-top: 50px;
+        }
+        .cat-pill {
+            padding: 18px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #fff;
+        }
+        .cat-pill:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0,229,255,0.3);
+            background: rgba(0,229,255,0.05);
+        }
+        .cat-pill .cat-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+        .cat-pill .cat-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+
+        /* ========== TESTIMONIAL / TRUST ========== */
+        .trust-section {
+            padding: 120px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .trust-quote {
+            font-size: clamp(1.3rem, 3vw, 1.9rem);
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+        .trust-quote em {
+            font-style: normal;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .trust-author { font-size: 14px; color: rgba(255,255,255,0.35); }
+
+        /* ========== CTA BANNER ========== */
+        .cta-banner {
+            margin: 0 20px 80px;
+            border-radius: 24px;
+            padding: 80px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0,229,255,0.08), rgba(176,0,255,0.08));
+            border: 1px solid rgba(0,229,255,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(0,229,255,0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .cta-banner h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+        .cta-banner p { color: rgba(255,255,255,0.5); margin-bottom: 36px; font-size: 16px; }
+
+        /* ========== FOOTER ========== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #ffffff;
+            box-shadow: 0 -5px 30px rgba(14,165,233,0.25);
+        }
+        .footer-logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .footer-copy { font-size: 13px; color: rgba(255,255,255,0.25); }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a {
+            font-size: 13px;
+            color: rgba(255,255,255,0.35);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--cyan); }
+
+        /* ========== SCROLL INDICATOR ========== */
+        .scroll-hint {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: linear-gradient(to bottom, transparent, rgba(5, 5, 10, 0.9)); /* Fades to dark at the bottom */
+            gap: 8px;
+            animation: fadeUp 0.8s 0.6s ease both;
+        }
+        .scroll-hint span { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 2px; text-transform: uppercase; }
+        .scroll-mouse {
+            width: 22px; height: 36px;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            padding-top: 6px;
+        }
+        .scroll-wheel {
+            width: 3px; height: 6px;
+            background: var(--cyan);
+            border-radius: 2px;
+            animation: scroll-anim 2s infinite;
+        }
+        @keyframes scroll-anim {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
         }
 
-        .info-title {
-            font-size: 2.5rem;
-            margin-bottom: 60px;
-            color: #fff;
-            text-align: center;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            max-width: 1000px;
-            width: 100%;
-        }
-
-        .feature-card {
-            background: rgba(20, 20, 30, 0.4);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 40px 30px;
-            border-radius: 20px;
-            text-align: center;
-            transition: all 0.4s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(0, 229, 255, 0.3);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.1);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #00e5ff;
-        }
-
-        .feature-card p {
-            color: #aaa;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: #555;
-            font-size: 0.9rem;
-            background: #020202;
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            nav { padding: 16px 20px; }
+            .nav-links .nav-link:not(.nav-cta) { display: none; }
+            .step:first-child, .step:last-child { border-radius: 0; }
+            .steps { gap: 1px; }
+            footer { padding: 30px 20px; flex-direction: column; text-align: center; }
+            .stats-strip { gap: 30px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-animated"></div>
+<div class="mesh">
+    <div class="mesh-blob blob1"></div>
+    <div class="mesh-blob blob2"></div>
+    <div class="mesh-blob blob3"></div>
+    <div class="mesh-blob blob4"></div>
+</div>
 
-    <div class="hero-section">
-        <div class="hero-content">
-            <h1>PeerPort</h1>
-            <p>The APSIT Student Marketplace</p>
-            
-            <div class="btn-group">
-            <button class="btn-login" onclick="window.location.href='/login.html'">Log In</button>
-            <button class="btn-start" onclick="window.location.href='/login.html'">Get Started</button>
-        </div>
-        </div>
-        
-        <a href="#about" class="scroll-down">↓</a>
+<!-- NAVBAR -->
+<nav>
+    <div class="nav-links">
+        <a href="#how" class="nav-link">How it works</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="/login.html" class="nav-link nav-cta">Get Started →</a>
     </div>
+</nav>
 
-    <div id="about" class="info-section">
-        <h2 class="info-title">Why use PeerPort?</h2>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🎓</div>
-                <h3>100% Verified</h3>
-                <p>No scammers. No strangers. Access is strictly limited to students with a valid @apsit.edu.in email address.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">💸</div>
-                <h3>Buy Smart</h3>
-                <p>Don't pay retail prices for textbooks and tools you'll only use for one semester. Buy directly from your seniors.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🌱</div>
-                <h3>Reduce Waste</h3>
-                <p>Give your old engineering textbooks, drafters, and lab equipment a second life. Earn back your cash while building a sustainable campus.</p>
-            </div>
+<section class="hero">
+   <!-- <div class="hero-badge">
+       <span class="badge-dot"></span>
+        Now live for APSIT students  
+    
+    </div> -->
+
+    <h1>
+        <span class="line1">Campus Resale Reimagined</span>
+        <span class="line2">PeerPort - Resale Platform For Students</span>
+    </h1>
+
+    <p class="hero-sub">
+        Buy and sell textbooks, lab tools, and engineering gear — exclusively within APSIT's verified student community. Safe, fast, and built for you.
+    </p>
+
+    <div class="hero-buttons">
+        <button class="btn-primary" onclick="window.location.href='/login.html'">Start Buying & Selling</button>
+        <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">See how it works</button>
+    </div>
+<!--
+    <div class="scroll-hint">
+        <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+        <span>Scroll</span>
+    </div>  -->
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+    <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Verified Students</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">₹0</div>
+        <div class="stat-label">Platform Fees</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">@apsit</div>
+        <div class="stat-label">Emails Only</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">4 Yrs</div>
+        <div class="stat-label">All Academic Years</div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+    <div class="section-tag">How it works</div>
+    <h2 class="section-title">Three steps to your <span>first deal</span></h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">01</div>
+            <span class="step-icon">🎓</span>
+            <h3>Verify your identity</h3>
+            <p>Sign up with your official @apsit.edu.in email. A one-time OTP confirms you're a real APSIT student.</p>
+            <div class="step-accent"></div>
+        </div>
+        <div class="step">
+            <div class="step-num">02</div>
+            <span class="step-icon">📦</span>
+            <h3>Browse or list</h3>
+            <p>Filter by semester, department, and category to find exactly what you need — or post your item in under 2 minutes.</p>
+            <div class="step-accent"></div>
+        </div>
+        <div class="step">
+            <div class="step-num">03</div>
+            <span class="step-icon">💬</span>
+            <h3>Chat & close the deal</h3>
+            <p>Message the buyer or seller through our secure in-app chat. Meet on campus, hand over the item, mark it done.</p>
+            <div class="step-accent"></div>
+        </div>
+        <div class="step">
+            <div class="step-num">04</div>
+            <span class="step-icon">⭐</span>
+            <h3>Rate your experience</h3>
+            <p>Leave a rating after each deal. Build your seller reputation and help others transact with confidence.</p>
+            <div class="step-accent"></div>
         </div>
     </div>
+</section>
 
-    <footer>
-        <p>&copy; 2026 PeerPort. Built exclusively for APSIT.</p>
-    </footer>
+<!-- CATEGORIES -->
+<div class="categories">
+    <div class="categories-inner">
+        <div class="section-tag">Browse by category</div>
+        <h2 class="section-title" style="margin-bottom:0;">Everything your <span style="background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">semester needs</span></h2>
+        <div class="cat-grid">
+            <a href="/login.html" class="cat-pill"><span class="cat-icon">📚</span><span class="cat-name">Textbooks</span></a>
+            <a href="/login.html" class="cat-pill"><span class="cat-icon">📐</span><span class="cat-name">Drafters & Tools</span></a>
+            <a href="/login.html" class="cat-pill"><span class="cat-icon">🔬</span><span class="cat-name">Lab Equipment</span></a>
+            <a href="/login.html" class="cat-pill"><span class="cat-icon">📝</span><span class="cat-name">Notes & Papers</span></a>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+    <div class="section-tag">Why PeerPort</div>
+    <h2 class="section-title">Built for students, <span>by students</span></h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon-wrap fi-cyan">🔒</div>
+            <h3>Verified-only access</h3>
+            <p>Every account is tied to an @apsit.edu.in email, verified via OTP. No outsiders, no scammers — ever.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap fi-purple">💬</div>
+            <h3>Secure in-app chat</h3>
+            <p>Your phone number is never shared. Chat entirely through our encrypted messaging system.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap fi-orange">🔍</div>
+            <h3>Smart search filters</h3>
+            <p>Filter by semester, year, department, and category to surface exactly what's relevant to your course work.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap fi-pink">📸</div>
+            <h3>Multi-photo listings</h3>
+            <p>Upload up to 5 photos per listing so buyers can inspect condition before reaching out.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap fi-green">⭐</div>
+            <h3>Seller ratings</h3>
+            <p>Every completed deal builds your reputation. A strong rating means faster sales and more trust from buyers.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap fi-yellow">🌱</div>
+            <h3>Sustainable campus</h3>
+            <p>Reduce academic waste by giving textbooks and tools a second life. Save money. Help juniors. Go green.</p>
+        </div>
+    </div>
+</section>
+
+<!-- TRUST QUOTE -->
+<div class="trust-section">
+    <div class="trust-quote">
+    "Why pay ₹800 for a textbook you'll use for <em>one semester</em> when your senior is selling it for ₹200 — and you can meet them in the canteen tomorrow?"<br>
+    No WhatsApp digging—just a secure, organized portal.
+</div>
+    <div class="trust-author">— The idea behind PeerPort</div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+    <h2>Ready to save money this semester?</h2>
+    <p>Join hundreds of APSIT students already buying and selling smarter.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="window.location.href='/login.html'">Create Free Account</button>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-copy">&copy; For any queries : peerport123@gmail.com</div>
+</footer>
 
 </body>
 </html>

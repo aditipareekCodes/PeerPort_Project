@@ -38,8 +38,10 @@
         th { background: rgba(0,0,0,0.5); color: #888; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
         td { color: #ccc; font-size: 15px; }
         
-        .delete-btn { background: rgba(255, 0, 60, 0.1); color: #ff003c; border: 1px solid rgba(255, 0, 60, 0.3); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.3s; }
+        .delete-btn { background: rgba(255, 0, 60, 0.1); color: #ff003c; border: 1px solid rgba(255, 0, 60, 0.3); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.3s; text-transform: uppercase; }
         .delete-btn:hover { background: #ff003c; color: #fff; }
+
+        .status-badge { font-size: 11px; color: #ff6b00; border: 1px solid #ff6b00; padding: 2px 6px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -90,10 +92,10 @@
                     <td>#{{ item.item_id }}</td>
                     <td style="color: #fff; font-weight: bold;">{{ item.title }}</td>
                     <td>₹{{ item.selling_price }}</td>
-                    <td>{{ item.status }}</td>
+                    <td><span class="status-badge">{{ item.status }}</span></td>
                     <td>
-                        <form action="/admin/delete_listing/{{ item.item_id }}" method="POST" onsubmit="return confirm('Are you sure you want to completely delete this item?');">
-                            <button type="submit" class="delete-btn">Delete Listing</button>
+                        <form action="/delete_listing/{{ item.item_id }}" method="POST" onsubmit="return confirm('Remove this listing from the marketplace?');">
+                            <button type="submit" class="delete-btn">Remove</button>
                         </form>
                     </td>
                 </tr>
@@ -116,7 +118,7 @@
                     <td style="color: #fff; font-weight: bold;">{{ user.full_name }}</td>
                     <td>{{ user.email }}</td>
                     <td>
-                        <form action="/admin/delete_user/{{ user.moodle_id }}" method="POST" onsubmit="return confirm('WARNING: This will delete the user AND all their active items/deals. Proceed?');">
+                        <form action="/delete_user/{{ user.moodle_id }}" method="POST" onsubmit="return confirm('WARNING: This will ban the user. Proceed?');">
                             <button type="submit" class="delete-btn">Ban User</button>
                         </form>
                     </td>
@@ -132,20 +134,20 @@
                     <th>Ticket ID</th>
                     <th>Student Name</th>
                     <th>Email</th>
-                    <th>Subject</th>
                     <th>Message</th>
+                    <th>Time</th>
                 </tr>
-                {% for msg in messages %}
+                {% for ticket in tickets %}
                 <tr>
-                    <td>#{{ msg.msg_id }}</td>
-                    <td style="color: #fff; font-weight: bold;">{{ msg.name }}</td>
-                    <td>{{ msg.email }}</td>
-                    <td style="color: #00e5ff;">{{ msg.subject }}</td>
-                    <td style="font-style: italic; color: #aaa;">"{{ msg.message }}"</td>
+                    <td>#{{ ticket.ticket_id }}</td>
+                    <td style="color: #fff; font-weight: bold;">{{ ticket.name }}</td>
+                    <td>{{ ticket.email }}</td>
+                    <td style="font-style: italic; color: #aaa;">"{{ ticket.message }}"</td>
+                    <td style="font-size: 11px; color: #666;">{{ ticket.timestamp }}</td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" style="text-align: center; color: #666; font-style: italic;">No support tickets received yet.</td>
+                    <td colspan="5" style="text-align: center; color: #666; font-style: italic; padding: 40px;">No support tickets received yet.</td>
                 </tr>
                 {% endfor %}
             </table>

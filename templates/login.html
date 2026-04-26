@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PeerPort | Secure Login</title>
     <style>
-        /* --- Restoring your original CSS exactly --- */
         .back-nav {
             position: absolute;
             top: 30px;
@@ -32,7 +31,6 @@
             background: rgba(0, 229, 255, 0.1);
             border-color: rgba(0, 229, 255, 0.5);
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #050505;
@@ -40,63 +38,46 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
         }
-
-        /* --- Your Original Cyan & Orange Orbs --- */
         .orb {
-            position: absolute;
+            position: fixed;
             border-radius: 50%;
             filter: blur(80px);
             z-index: -1;
             opacity: 0.5;
             animation: float 8s infinite alternate ease-in-out;
         }
-        .orb-cyan { 
-            width: 350px; height: 350px; background: #00ffff; 
-            top: 5%; left: 15%; 
-        }
-        .orb-orange { 
-            width: 300px; height: 300px; background: #ff6b00; 
-            bottom: 5%; right: 15%; animation-delay: -4s; 
-        }
-
+        .orb-cyan { width: 350px; height: 350px; background: #00ffff; top: 5%; left: 15%; }
+        .orb-orange { width: 300px; height: 300px; background: #ff6b00; bottom: 5%; right: 15%; animation-delay: -4s; }
         @keyframes float {
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(40px, 50px) scale(1.2); }
         }
-
-        /* --- Your Original Card Style --- */
         .auth-container {
             background: rgba(20, 20, 20, 0.6);
             backdrop-filter: blur(15px);
             padding: 40px;
             border-radius: 16px;
             border: 1px solid rgba(0, 229, 255, 0.2);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                        0 0 20px rgba(0, 229, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8),
+                        inset 0 1px 0 rgba(255,255,255,0.1),
+                        0 0 20px rgba(0,229,255,0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             z-index: 1;
-            transition: transform 0.3s ease;
         }
-        
-        .auth-container:hover {
-            transform: translateY(-5px);
-        }
-
         h2 {
             text-align: center;
-            margin-bottom: 5px; 
+            margin-bottom: 5px;
             font-size: 32px;
             background: linear-gradient(90deg, #00e5ff, #ffffff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
         .tagline {
             text-align: center;
             color: #888;
@@ -105,29 +86,47 @@
             letter-spacing: 2px;
             margin-bottom: 25px;
         }
-
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; color: #b3b3b3; margin-bottom: 8px; text-transform: uppercase; }
-        
-        input {
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block;
+            font-size: 12px;
+            color: #b3b3b3;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .req { color: #ff4444; margin-left: 3px; }
+        input, select {
             width: 100%;
             padding: 12px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.5);
             border: 1px solid #333;
             color: #fff;
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 15px;
             transition: all 0.3s ease;
+            font-family: inherit;
         }
-        
-        input:focus {
+        select option { background: #1a1a1a; color: #fff; }
+        input:focus, select:focus {
             outline: none;
             border-color: #00e5ff;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0,229,255,0.4);
         }
-
-        /* Your Original Orange Button */
+        input:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        input.error { border-color: #ff4444; }
+        input.success { border-color: #00e676; }
+        .hint {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .row { display: flex; gap: 10px; }
+        .row input, .row select { flex: 1; }
         button {
             width: 100%;
             padding: 14px;
@@ -139,11 +138,77 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-family: inherit;
         }
-
-        .link-text { text-align: center; margin-top: 20px; font-size: 14px; color: #888; }
-        .link-text a { color: #00e5ff; text-decoration: none; cursor: pointer; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-otp {
+            padding: 12px 14px;
+            font-size: 10px;
+            white-space: nowrap;
+            width: auto;
+            background: linear-gradient(45deg, #333, #444);
+            border: 1px solid #555;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #fff;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .btn-otp:hover:not(:disabled) {
+            background: linear-gradient(45deg, #00b8cc, #00e5ff);
+            border-color: #00e5ff;
+            color: #000;
+        }
+        .btn-otp:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-register {
+            background: linear-gradient(45deg, #00b8cc, #0077ff);
+            margin-top: 5px;
+        }
+        .link-text {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #888;
+        }
+        .link-text a {
+            color: #00e5ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .link-text a:hover { text-decoration: underline; }
         .hidden { display: none; }
+        .flash-danger {
+            background: rgba(255,50,50,0.15);
+            border: 1px solid rgba(255,50,50,0.3);
+            color: #ff6b6b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        .flash-success {
+            background: rgba(0,200,100,0.15);
+            border: 1px solid rgba(0,200,100,0.3);
+            color: #00e676;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        .otp-status {
+            font-size: 11px;
+            margin-top: 5px;
+            min-height: 16px;
+        }
+        .otp-status.sent { color: #00e676; }
+        .otp-status.error { color: #ff4444; }
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -156,61 +221,272 @@
 </div>
 
 <div class="auth-container">
-    
+
+    <!-- ==================== LOGIN SECTION ==================== -->
     <div id="login-section">
         <h2>PeerPort</h2>
         <p class="tagline">Resale Platform For Students</p>
-        
-        <form action="/login" method="POST">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form action="/login.html" method="POST">
             <div class="form-group">
-                <label>8-Digit Moodle ID</label>
-                <input type="text" name="moodle_id" placeholder="e.g. 24104027" 
-                       pattern="\d{8}" maxlength="8" title="Must be exactly 8 digits" required>
+                <label>Moodle ID <span class="req">*</span></label>
+                <input type="text" name="moodle_id" placeholder="e.g. 24104027"
+                       pattern="\d{8}" maxlength="8"
+                       title="Must be exactly 8 digits" required>
             </div>
             <div class="form-group">
-                <label>8-Digit Password</label>
-                <input type="password" name="password" placeholder="••••••••" 
-                       pattern="\d{8}" maxlength="8" title="Must be exactly 8 digits" required>
+                <label>Password <span class="req">*</span></label>
+                <input type="password" name="password" placeholder="Your password" required>
             </div>
-            <button type="submit">LOGIN SYSTEM</button>
+            <button type="submit">LOGIN</button>
         </form>
-        
-        <div class="link-text">
-            New recruit? <a onclick="showSection('register-section')">Initialize Registration</a>
+
+        <div class="link-text" style="margin-top:18px;">
+            New here? <a onclick="showSection('register-section')">Create an account</a>
+        </div>
+        <div class="link-text" style="margin-top:10px;">
+            <a href="/forgot-password">Forgot Password?</a>
         </div>
     </div>
 
+    <!-- ==================== REGISTER SECTION ==================== -->
     <div id="register-section" class="hidden">
-        <h2>Create Access</h2>
-        <p class="tagline">Join PeerPort</p>
-        <form action="/register" method="POST">
+        <h2>Join PeerPort</h2>
+        <p class="tagline">Create your student account</p>
+
+        <form action="/register.html" method="POST" id="register-form">
+
+            <!-- Full Name -->
             <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="full_name" placeholder="Aditi Pareek" required>
+                <label>Full Name <span class="req">*</span></label>
+                <input type="text" name="full_name" placeholder="e.g. Aditi Pareek" required>
             </div>
+
+            <!-- Phone -->
             <div class="form-group">
-                <label>Official Email</label>
-                <input type="email" name="email" placeholder="ID@apsit.edu.in" 
-                       pattern="[a-zA-Z0-9._%+-]+@apsit\.edu\.in$" required>
+                <label>Phone Number <span class="req">*</span></label>
+                <input type="tel" name="phone" placeholder="e.g. 9876543210"
+                       pattern="\d{10}" maxlength="10"
+                       title="Must be a 10-digit number" required>
+                <div class="hint">10 digits, kept private — used only for deal coordination</div>
             </div>
+
+            <!-- Official Email + OTP button -->
             <div class="form-group">
-                <label>8-Digit Password</label>
-                <input type="password" name="password" pattern="\d{8}" maxlength="8" required>
+                <label>Official College Email <span class="req">*</span></label>
+                <div class="row">
+                    <input type="email" name="email" id="reg-email"
+                           placeholder="12345678@apsit.edu.in"
+                           pattern="[0-9]{8}@apsit\.edu\.in"
+                           title="Must be your 8-digit Moodle ID @apsit.edu.in"
+                           required>
+                    <button type="button" class="btn-otp" id="get-otp-btn" onclick="sendOTP()">GET OTP</button>
+                </div>
+                <div class="hint">Only @apsit.edu.in emails are accepted</div>
             </div>
-            <button type="submit" style="background: #00b8cc;">CREATE ACCOUNT</button>
+
+            <!-- OTP input — locked until sent -->
+            <div class="form-group">
+                <label>OTP Verification <span class="req">*</span></label>
+                <input type="text" name="otp_code" id="otp-input"
+                       placeholder="Request OTP first"
+                       maxlength="6" disabled required>
+                <div class="otp-status" id="otp-status"></div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Department + Year in one row -->
+            <div class="form-group">
+                <label>Department <span class="req">*</span></label>
+                <select name="department" required>
+                    <option value="" disabled selected>Select your department</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="CS">Computer Science</option>
+                    <option value="AIML">AI & Machine Learning</option>
+                    <option value="DS">Data Science</option>
+                    <option value="Civil">Civil Engineering</option>
+                    <option value="Mech">Mechanical Engineering</option>
+                    <option value="Electrical">Humanities & Applied Sciences</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Current Year <span class="req">*</span></label>
+                <select name="year" required>
+                    <option value="" disabled selected>Select your year</option>
+                    <option value="FE">First Year (FE)</option>
+                    <option value="SE">Second Year (SE)</option>
+                    <option value="TE">Third Year (TE)</option>
+                    <option value="BE">Final Year (BE)</option>
+                </select>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Password -->
+            <div class="form-group">
+                <label>Password <span class="req">*</span></label>
+                <input type="password" name="password" id="reg-password"
+                       placeholder="Create a strong password" required>
+                <div class="hint">Min 8 chars · 1 uppercase · 1 lowercase · 1 number · 1 special character (!@#$...)</div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label>Confirm Password <span class="req">*</span></label>
+                <input type="password" name="confirm_password" id="confirm-password"
+                       placeholder="Re-enter your password" required>
+                <div class="hint" id="pw-match-hint" style="min-height:14px;"></div>
+            </div>
+
+            <button type="submit" class="btn-register">CREATE ACCOUNT</button>
         </form>
-        <div class="link-text">
-            <a onclick="showSection('login-section')">Return to Login</a>
+
+        <div class="link-text" style="margin-top:18px;">
+            Already have an account? <a onclick="showSection('login-section')">Log in</a>
         </div>
     </div>
+
 </div>
 
 <script>
-    function showSection(sectionId) {
+    // ---- Section toggle ----
+    function showSection(id) {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('register-section').classList.add('hidden');
-        document.getElementById(sectionId).classList.remove('hidden');
+        document.getElementById(id).classList.remove('hidden');
     }
+
+    // ---- OTP: locked until sent ----
+    let otpSent = false;
+
+    async function sendOTP() {
+        const emailInput = document.getElementById('reg-email');
+        const btn = document.getElementById('get-otp-btn');
+        const otpInput = document.getElementById('otp-input');
+        const statusEl = document.getElementById('otp-status');
+        const email = emailInput.value.trim().toLowerCase();
+
+        // Validate email before sending
+        if (!email) {
+            statusEl.className = 'otp-status error';
+            statusEl.textContent = 'Please enter your college email first.';
+            emailInput.focus();
+            return;
+        }
+        const parts = email.split('@');
+        if (parts[1] !== 'apsit.edu.in' || !/^\d{8}$/.test(parts[0])) {
+            statusEl.className = 'otp-status error';
+            statusEl.textContent = 'Email must be in format: 12345678@apsit.edu.in';
+            emailInput.classList.add('error');
+            return;
+        }
+        if (parts[0] === '{{ admin_id | default("24104027") }}') {
+            statusEl.className = 'otp-status error';
+            statusEl.textContent = 'This ID cannot be registered.';
+            return;
+        }
+
+        emailInput.classList.remove('error');
+        btn.disabled = true;
+        btn.textContent = 'SENDING...';
+        statusEl.className = 'otp-status';
+        statusEl.textContent = '';
+
+        try {
+            const res = await fetch('/send_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                otpSent = true;
+                otpInput.disabled = false;
+                otpInput.placeholder = 'Enter 6-digit OTP';
+                otpInput.focus();
+                emailInput.classList.add('success');
+                statusEl.className = 'otp-status sent';
+                statusEl.textContent = '✅ OTP sent to ' + email + ' — check your inbox (expires in 5 min)';
+
+                // 60s cooldown
+                let countdown = 60;
+                btn.textContent = `WAIT ${countdown}s`;
+                const timer = setInterval(() => {
+                    countdown--;
+                    btn.textContent = `WAIT ${countdown}s`;
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.textContent = 'RESEND';
+                    }
+                }, 1000);
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'GET OTP';
+                statusEl.className = 'otp-status error';
+                statusEl.textContent = '❌ ' + data.message;
+            }
+        } catch (err) {
+            btn.disabled = false;
+            btn.textContent = 'GET OTP';
+            statusEl.className = 'otp-status error';
+            statusEl.textContent = '❌ Network error. Please try again.';
+        }
+    }
+
+    // ---- Live password match indicator ----
+    document.getElementById('confirm-password').addEventListener('input', function () {
+        const pw = document.getElementById('reg-password').value;
+        const hint = document.getElementById('pw-match-hint');
+        if (!this.value) { hint.textContent = ''; return; }
+        if (this.value === pw) {
+            hint.style.color = '#00e676';
+            hint.textContent = '✅ Passwords match';
+        } else {
+            hint.style.color = '#ff4444';
+            hint.textContent = '❌ Passwords do not match';
+        }
+    });
+
+    // ---- Form submit validation ----
+    document.getElementById('register-form').addEventListener('submit', function (e) {
+        const email = document.getElementById('reg-email').value.trim().toLowerCase();
+        const password = document.getElementById('reg-password').value;
+        const confirm = document.getElementById('confirm-password').value;
+        const statusEl = document.getElementById('otp-status');
+
+        // OTP must have been sent
+        if (!otpSent) {
+            e.preventDefault();
+            statusEl.className = 'otp-status error';
+            statusEl.textContent = '❌ Please request and enter your OTP before submitting.';
+            document.getElementById('get-otp-btn').scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
+        // Password match
+        if (password !== confirm) {
+            e.preventDefault();
+            alert('❌ Passwords do not match.');
+            return;
+        }
+
+        // Password policy
+        if (password.length < 8) { e.preventDefault(); alert('❌ Password must be at least 8 characters.'); return; }
+        if (!/[A-Z]/.test(password)) { e.preventDefault(); alert('❌ Need at least one uppercase letter.'); return; }
+        if (!/[a-z]/.test(password)) { e.preventDefault(); alert('❌ Need at least one lowercase letter.'); return; }
+        if (!/[0-9]/.test(password)) { e.preventDefault(); alert('❌ Need at least one number.'); return; }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) { e.preventDefault(); alert('❌ Need at least one special character.'); return; }
+    });
 </script>
 
 </body>

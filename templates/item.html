@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PeerPort | {{ item.title }}</title>
+
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 40px; }
-        
-        /* BULLETPROOF FLEXBOX CONTAINER */
+
+        /* CONTAINER */
         .container { 
             display: flex; 
-            flex-wrap: wrap; /* Allows stacking on smaller screens */
+            flex-wrap: wrap; 
             gap: 40px; 
-            max-width: 1000px; 
+            max-width: 1100px; 
             margin: 0 auto; 
             background: rgba(15, 15, 15, 0.85); 
             backdrop-filter: blur(15px); 
@@ -20,18 +21,17 @@
             padding: 40px; 
             border-radius: 16px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.8); 
-            box-sizing: border-box; /* Stops horizontal blowouts! */
-            overflow: hidden; /* Forcefully contains escaping elements */
+            box-sizing: border-box;
         }
-        
-        .left-col { flex: 1; min-width: 300px; }
-        .right-col { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
 
-        /* IMAGE WRAPPER (Forces shape even if image is missing) */
+        .left-col { flex: 1.2; min-width: 350px; }
+        .right-col { flex: 1; min-width: 350px; display: flex; flex-direction: column; }
+
+        /* IMAGE */
         .img-wrapper {
             width: 100%;
-            height: 400px;
-            background-color: #0a0a0a;
+            height: 450px;
+            background-color: #000;
             border-radius: 12px;
             border: 1px solid #333;
             display: flex;
@@ -45,97 +45,138 @@
             max-width: 100%; 
             max-height: 100%; 
             object-fit: contain; 
-            cursor: pointer; 
-            transition: transform 0.3s ease;
+            cursor: zoom-in;
         }
-        .main-img:hover { transform: scale(1.05); }
-        
-        .thumb-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .thumb-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; opacity: 0.6; }
-        .thumb-img:hover, .thumb-img.active { opacity: 1; border-color: #00e5ff; }
+
+        .thumb-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+
+        .thumb-img { 
+            width: 70px; 
+            height: 70px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            border: 2px solid transparent; 
+            cursor: pointer; 
+            opacity: 0.6; 
+        }
+
+        .thumb-img:hover { opacity: 1; border-color: #00e5ff; }
+
+        /* MODAL (ZOOM) */
+        .img-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        .img-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+        }
 
         /* DETAILS */
-        h1 { color: #fff; margin: 0 0 10px 0; font-size: 32px; line-height: 1.2; }
-        .tags { margin-bottom: 20px; }
-        .tags .badge { background: #222; padding: 5px 12px; border-radius: 6px; font-size: 12px; color: #ccc; border: 1px solid #333; margin-right: 5px; }
-        
-        .price-box { padding: 20px; background: rgba(0,0,0,0.5); border-radius: 12px; border-left: 4px solid #00e5ff; margin-bottom: 25px; }
-        .price-tag { color: #00e5ff; font-weight: bold; font-size: 36px; }
-        .original-price { color: #666; text-decoration: line-through; font-size: 18px; margin-left: 10px; }
-        
-        .seller-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: #111; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; }
-        .seller-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #00e5ff; }
-        .seller-info h4 { margin: 0 0 5px 0; color: #fff; }
-        .stars { color: #fdd835; font-size: 14px; }
+        h1 { margin: 0 0 10px 0; font-size: 32px; }
 
-        .description-box { margin-bottom: 30px; line-height: 1.6; color: #ccc; font-size: 15px; white-space: pre-wrap; flex-grow: 1; }
-        .condition-text { color: #ffeb3b; font-weight: bold; }
-        
-        .btn { display: block; padding: 16px; background: linear-gradient(45deg, #00e5ff, #0077ff); color: black; font-weight: bold; text-decoration: none; border-radius: 8px; text-align: center; border: none; cursor: pointer; text-transform: uppercase; font-size: 18px; width: 100%; transition: 0.3s; box-sizing: border-box; margin-top: auto;}
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0, 229, 255, 0.4); color: white; }
-        
-        .back-nav { margin-bottom: 30px; }
-        .back-nav a { color: #888; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; }
-        .back-nav a:hover { color: #fff; border-color: rgba(0, 229, 255, 0.5); }
+        .badge { background: #222; padding: 5px 12px; border-radius: 6px; font-size: 12px; color: #ccc; border: 1px solid #333; }
+
+        .price-box { padding: 20px; background: rgba(0,0,0,0.4); border-radius: 12px; border-left: 4px solid #00e5ff; margin: 20px 0; }
+
+        .price-tag { color: #00e5ff; font-weight: bold; font-size: 36px; }
+
+        .original-price { color: #666; text-decoration: line-through; font-size: 18px; margin-left: 10px; }
+
+        .seller-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: #111; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; }
+
+        .seller-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #00e5ff; }
+
+        .description-box { margin-bottom: 30px; color: #bbb; }
+
+        .btn { 
+            padding: 18px; 
+            background: linear-gradient(45deg, #00e5ff, #0077ff); 
+            color: black; 
+            font-weight: bold; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%;
+        }
+
+        .back-nav a { color: #888; text-decoration: none; }
     </style>
 </head>
+
 <body>
 
-    <div class="back-nav">
-        <a href="/buy.html">← Back to Marketplace</a>
+<div class="back-nav">
+    <a href="/buy.html">← Return to Marketplace</a>
+</div>
+
+<div class="container">
+    <div class="left-col">
+        {% set images = item.image_file.split(',') %}
+
+        <div class="img-wrapper">
+            <img id="main-img"
+                 src="{{ url_for('static', filename='uploads/' + images[0]) }}"
+                 class="main-img"
+                 onclick="openImg(this.src)"
+                 onerror="this.src='/static/uploads/default_book.png'">
+        </div>
+
+        <div class="thumb-row">
+            {% for img in images %}
+            <img src="{{ url_for('static', filename='uploads/' + img) }}"
+                 class="thumb-img"
+                 onclick="document.getElementById('main-img').src=this.src; openImg(this.src);"
+                 onerror="this.style.display='none'">
+            {% endfor %}
+        </div>
     </div>
 
-    <div class="container">
-        <div class="left-col">
-            {% set images = item.image_file.split(',') %}
-            
-            <div class="img-wrapper">
-                <img id="main-img" src="{{ url_for('static', filename='uploads/' + images[0]) }}" class="main-img" title="Click to view full screen" onclick="window.open(this.src, '_blank')" onerror="this.src='https://via.placeholder.com/400x400/111/00e5ff?text=Image+Not+Found'">
-            </div>
-            
-            {% if images|length > 1 %}
-            <div class="thumb-row">
-                {% for img in images %}
-                    <img src="{{ url_for('static', filename='uploads/' + img) }}" class="thumb-img" onclick="document.getElementById('main-img').src=this.src;" onerror="this.style.display='none'">
-                {% endfor %}
-            </div>
+    <div class="right-col">
+        <h1>{{ item.title }}</h1>
+
+        <div class="price-box">
+            <span class="price-tag">₹{{ item.selling_price }}</span>
+            {% if item.original_price and item.original_price > item.selling_price %}
+            <span class="original-price">₹{{ item.original_price }}</span>
             {% endif %}
         </div>
 
-        <div class="right-col">
-            <h1>{{ item.title }}</h1>
-            <div class="tags">
-                <span class="badge">{{ item.category }} Dept</span> 
-                <span class="badge">{{ item.semester }}</span>
-            </div>
-
-            <div class="price-box">
-                <span class="price-tag">₹{{ item.selling_price }}</span>
-                {% if item.original_price and item.original_price > 0 %}
-                <span class="original-price">₹{{ item.original_price }}</span>
-                {% endif %}
-            </div>
-
-            <div class="seller-card">
-                <img src="{{ url_for('static', filename='uploads/' + (item.profile_pic if item.profile_pic else 'default_avatar.png')) }}" class="seller-avatar" onerror="this.src='https://ui-avatars.com/api/?name={{ item.seller_name }}&background=00e5ff&color=000'">
-                <div class="seller-info">
-                    <h4>{{ item.seller_name }}</h4>
-                    <div class="stars">
-                        ⭐ {{ item.seller_rating }} <span style="color: #666; font-size: 12px;">({{ item.rating_count }} Reviews)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="description-box">
-                <strong>Condition:</strong> <span class="condition-text">{{ item.condition }}</span><br><br>
-                {{ item.description }}
-            </div>
-
-            <form action="/request_item/{{ item.item_id }}" method="POST" style="margin: 0; width: 100%;">
-                <button type="submit" class="btn">Request Asset</button>
-            </form>
+        <div class="description-box">
+            <p>{{ item.description }}</p>
         </div>
+
+        <form action="/request_item/{{ item.item_id }}" method="POST">
+            <button type="submit" class="btn">Confirm Request</button>
+        </form>
     </div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div id="imgModal" class="img-modal" onclick="closeImg()">
+    <img id="modalImg">
+</div>
+
+<script>
+function openImg(src) {
+    document.getElementById("imgModal").style.display = "flex";
+    document.getElementById("modalImg").src = src;
+}
+
+function closeImg() {
+    document.getElementById("imgModal").style.display = "none";
+}
+</script>
 
 </body>
 </html>

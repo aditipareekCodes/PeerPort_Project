@@ -7,51 +7,98 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 40px; }
         h1 { color: #00e5ff; margin-bottom: 20px; font-size: 36px; text-transform: uppercase; letter-spacing: 2px;}
+        
         .filter-bar { background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(0, 229, 255, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 30px; }
         .filter-input { padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid #333; color: white; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 20px; transition: 0.3s; display: flex; flex-direction: column; }
-        .card:hover { transform: translateY(-5px); border-color: #00e5ff; }
+        .card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 20px; transition: 0.3s; display: flex; flex-direction: column; position: relative; }
+        .card:hover { transform: translateY(-5px); border-color: #00e5ff; box-shadow: 0 10px 20px rgba(0, 229, 255, 0.1); }
+        
         .main-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; background: #000; }
-        .title { font-size: 18px; margin: 0 0 10px 0; color: #fff; height: 45px; overflow: hidden; }
-        .price-tag { color: #00e5ff; font-weight: bold; font-size: 22px; }
-        .badge { background: #222; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #aaa; border: 1px solid #333; margin-right: 5px; }
-        .btn { display: block; padding: 12px; background: transparent; color: #00e5ff; font-weight: bold; text-decoration: none; border-radius: 8px; text-align: center; border: 1px solid #00e5ff; margin-top: auto; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
-        .btn:hover { background: rgba(0, 229, 255, 0.1); box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2); }
-        .back-nav a { color: #888; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid #333; }
+        .title { font-size: 18px; margin: 0 0 10px 0; color: #fff; height: 45px; overflow: hidden; font-weight: 600; }
+        
+        /* Price Styling */
+        .price-section { margin-bottom: 15px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+        .selling-price { color: #00e5ff; font-weight: bold; font-size: 22px; }
+        .original-price { text-decoration: line-through; color: #666; font-size: 14px; }
+        .discount-tag { color: #00ff88; font-size: 13px; font-weight: bold; }
+        
+        .badge-container { margin-bottom: 20px; }
+        .badge { background: #222; padding: 4px 10px; border-radius: 4px; font-size: 11px; color: #aaa; border: 1px solid #333; margin-right: 5px; text-transform: uppercase; }
+        
+        .btn { display: block; padding: 12px; background: transparent; color: #00e5ff; font-weight: bold; text-decoration: none; border-radius: 8px; text-align: center; border: 1px solid #00e5ff; margin-top: auto; transition: 0.3s; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        .btn:hover { background: #00e5ff; color: #000; }
+        
+        .back-nav a { color: #888; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid #333; transition: 0.3s; }
+        .back-nav a:hover { color: #fff; border-color: #00e5ff; }
     </style>
 </head>
 <body>
-    <div class="back-nav" style="margin-bottom: 30px;"><a href="/dashboard.html">← Dashboard</a></div>
+    <div class="back-nav" style="margin-bottom: 30px;"><a href="/dashboard.html">← Back to Dashboard</a></div>
+    
     <h1>🌐 Campus Marketplace</h1>
+
     <div class="filter-bar">
-        <form action="/buy.html" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <div style="flex: 2; min-width: 200px;"><input type="text" name="search" class="filter-input" placeholder="Search assets..." value="{{ search }}"></div>
-            <div style="flex: 1;"><select name="category" class="filter-input">
-                <option value="All" {% if current_category == 'All' %}selected{% endif %}>All Depts</option>
-                <option value="IT" {% if current_category == 'IT' %}selected{% endif %}>IT</option>
-                <option value="CS" {% if current_category == 'CS' %}selected{% endif %}>CS</option>
-                <option value="Mech" {% if current_category == 'Mech' %}selected{% endif %}>Mech</option>
-                <option value="Civil" {% if current_category == 'Civil' %}selected{% endif %}>Civil</option>
-                <option value="DS" {% if current_category == 'DS' %}selected{% endif %}>DS</option>
-                <option value="AIML" {% if current_category == 'AIML' %}selected{% endif %}>AIML</option>
-            </select></div>
-            <div style="flex: 1;"><select name="semester" class="filter-input">
-                <option value="Any" {% if current_semester == 'Any' %}selected{% endif %}>Any Sem</option>
-                {% for i in range(1, 9) %}<option value="Sem {{i}}" {% if current_semester == 'Sem ' ~ i %}selected{% endif %}>Sem {{i}}</option>{% endfor %}
-            </select></div>
-            <button type="submit" style="padding: 12px 25px; background: #00e5ff; color: black; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;">FILTER</button>
+        <form action="/buy.html" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 2; min-width: 200px;">
+                <input type="text" name="search" class="filter-input" placeholder="Search assets (e.g. drafter)..." value="{{ search or '' }}">
+            </div>
+            <div style="flex: 1; min-width: 120px;">
+                <select name="category" class="filter-input">
+                    <option value="All" {% if current_category == 'All' %}selected{% endif %}>All Depts</option>
+                    <option value="ECE" {% if current_category == 'Humanities & Applied Sciences' %}selected{% endif %}>Humanities & Applied Sciences</option>
+                    <option value="IT" {% if current_category == 'IT' %}selected{% endif %}>IT</option>
+                    <option value="CS" {% if current_category == 'CS' %}selected{% endif %}>CS</option>
+                    <option value="Mech" {% if current_category == 'Mechanical' %}selected{% endif %}>Mechanical</option>
+                    <option value="Civil" {% if current_category == 'Civil' %}selected{% endif %}>Civil</option>
+                    <option value="General" {% if current_category == 'Data Science' %}selected{% endif %}>Data Science</option>
+                    <option value="Other" {% if current_category == 'Artificial Intelligence & Machine Learning' %}selected{% endif %}>Artificial Intelligence & Machine Learning</option>
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 120px;">
+                <select name="semester" class="filter-input">
+                    <option value="Any" {% if current_semester == 'Any' %}selected{% endif %}>Any Sem</option>
+                    {% for i in range(1, 9) %}
+                    <option value="Sem {{i}}" {% if current_semester == 'Sem ' ~ i %}selected{% endif %}>Sem {{i}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" style="padding: 12px 25px; background: #00e5ff; color: black; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s;">APPLY</button>
         </form>
     </div>
+
     <div class="grid">
         {% for item in items %}
         <div class="card">
             {% set images = item.image_file.split(',') %}
-            <img src="{{ url_for('static', filename='uploads/' + images[0]) }}" class="main-img" onerror="this.src='https://via.placeholder.com/300x180/111/00e5ff?text=No+Image'">
+            {% set images = item.image_file.split(',') %}
+<img src="{{ url_for('static', filename='uploads/' + (images[0] if images[0] else 'default_book.png')) }}" 
+     class="card-img" 
+     onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
             <h3 class="title">{{ item.title }}</h3>
-            <div style="margin-bottom: 15px;"><span class="price-tag">₹{{ item.selling_price }}</span></div>
-            <div style="margin-bottom: 15px;"><span class="badge">{{ item.category }}</span><span class="badge">{{ item.semester }}</span></div>
+
+            <div class="price-section">
+                <span class="selling-price">₹{{ item.selling_price }}</span>
+                
+                {% if item.original_price and item.original_price|float > item.selling_price|float %}
+                    <span class="original-price">₹{{ item.original_price }}</span>
+                    <span class="discount-tag">
+                        {{ (((item.original_price|float - item.selling_price|float) / item.original_price|float) * 100)|round|int }}% OFF
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="badge-container">
+                <span class="badge">{{ item.category }}</span>
+                <span class="badge">{{ item.semester }}</span>
+            </div>
+
             <a href="/item/{{ item.item_id }}" class="btn">View Details</a>
+        </div>
+        {% else %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #555;">
+            <p>No items found matching your filters.</p>
         </div>
         {% endfor %}
     </div>
