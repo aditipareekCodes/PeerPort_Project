@@ -58,7 +58,7 @@ def init_db():
             phone TEXT,
             department TEXT,
             year TEXT, 
-            privacy_mode TEXT DEFAULT 'Public',
+            privacy_mode TEXT DEFAULT 'Email Only',
             profile_pic TEXT DEFAULT 'default_avatar.png',
             seller_rating REAL DEFAULT 5.0,
             rating_count INTEGER DEFAULT 1,
@@ -294,8 +294,11 @@ def register():
 @app.route('/dashboard.html')
 @login_required
 def dashboard():
-    # Displays personalized welcome (Objective 25) 
-    return render_template('dashboard.html', user_name=session.get('user_name'))
+    # Displays personalized welcome and user rating summary
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+    conn.close()
+    return render_template('dashboard.html', user_name=session.get('user_name'), user=user)
 
 @app.route('/logout')
 def logout():
@@ -606,7 +609,7 @@ def view_item(item_id):
     if 'user_id' not in session: return redirect('/login.html')
     conn = get_db_connection()
     item = conn.execute(
-        'SELECT l.*, u.full_name as seller_name, u.seller_rating, u.profile_pic '
+        'SELECT l.*, u.full_name as seller_name, u.seller_rating, u.profile_pic, u.email as seller_email, u.phone as seller_phone, u.privacy_mode '
         'FROM listings l JOIN users u ON l.seller_id = u.moodle_id WHERE l.item_id = ?',
         (item_id,)
     ).fetchone()
@@ -669,19 +672,35 @@ def purchases():
 
     buying_raw = conn.execute('''
         SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status,
-               u.full_name as other_party, t.seller_id, t.item_id
+               u.full_name as other_party, u.email as other_email, u.phone as other_phone, u.privacy_mode as other_privacy,
+               u.seller_rating as other_rating, u.rating_count as other_rating_count,
+               t.seller_id, t.item_id
         FROM transactions t
         JOIN listings l ON t.item_id = l.item_id
         JOIN users u ON t.seller_id = u.moodle_id
         WHERE t.buyer_id = ?''', (uid,)).fetchall()
 
-    selling_raw = conn.execute('''
-        SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status,
-               u.full_name as other_party, t.buyer_id, t.item_id
-        FROM transactions t
-        JOIN listings l ON t.item_id = l.item_id
-        JOIN users u ON t.buyer_id = u.moodle_id
-        WHERE t.seller_id = ?''', (uid,)).fetchall()
+    try:
+        selling_raw = conn.execute('''
+            SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status,
+                   u.full_name as other_party, u.email as other_email, u.phone as other_phone, u.privacy_mode as other_privacy,
+                   u.buyer_rating as other_rating, u.buyer_rating_count as other_rating_count,
+                   t.buyer_id, t.item_id
+            FROM transactions t
+            JOIN listings l ON t.item_id = l.item_id
+            JOIN users u ON t.buyer_id = u.moodle_id
+            WHERE t.seller_id = ?''', (uid,)).fetchall()
+    except:
+        # Fallback if buyer_rating column doesn't exist
+        selling_raw = conn.execute('''
+            SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status,
+                   u.full_name as other_party, u.email as other_email, u.phone as other_phone, u.privacy_mode as other_privacy,
+                   5.0 as other_rating, 0 as other_rating_count,
+                   t.buyer_id, t.item_id
+            FROM transactions t
+            JOIN listings l ON t.item_id = l.item_id
+            JOIN users u ON t.buyer_id = u.moodle_id
+            WHERE t.seller_id = ?''', (uid,)).fetchall()
 
     # My available listings (not in any active transaction)
     my_listings = conn.execute('''

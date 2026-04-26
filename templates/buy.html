@@ -5,7 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PeerPort | Marketplace</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #050505; color: white; margin: 0; padding: 40px; }
+orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 8s infinite alternate ease-in-out;
+        }
+        .orb-cyan { width: 350px; height: 350px; background: #0099ff; top: 5%; left: 15%; }
+        .orb-orange { width: 300px; height: 300px; background: #6600ff; bottom: 5%; right: 15%; animation-delay: -4s; }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 50px) scale(1.2); }
+        }
+        
+        body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #050505;
+        color: #ffffff;
+        min-height: 100vh;
+        margin: 0;
+        padding: 30px;
+        box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Orbs */
+.orb {
+    position: fixed;
+    border-radius: 99%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.4;
+    animation: float 8s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+.orb-cyan  { width: 400px; height: 400px; background: #0099ff; top: -40px; left: -80px; }
+.orb-purple{ width: 400px; height: 400px; background: #6600ff; bottom: -80px; right: -80px; animation-delay: -4s; }
+
+@keyframes float {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 50px) scale(1.15); }
+}
+
+/* Grid overlay for depth */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+}
+
+/* Glowing center radial */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,153,255,0.08) 0%, transparent 60%);
+}
+
         h1 { color: #00e5ff; margin-bottom: 20px; font-size: 36px; text-transform: uppercase; letter-spacing: 2px;}
         
         .filter-bar { background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(0, 229, 255, 0.2); padding: 20px; border-radius: 12px; margin-bottom: 30px; }
@@ -34,9 +98,13 @@
     </style>
 </head>
 <body>
+  
+    <div class="orb orb-cyan"></div>
+    <div class="orb orb-purple"></div>
+
     <div class="back-nav" style="margin-bottom: 30px;"><a href="/dashboard.html">← Back to Dashboard</a></div>
     
-    <h1>🌐 Campus Marketplace</h1>
+    <h1>🌐 PeerPorts's Campus Marketplace</h1>
 
     <div class="filter-bar">
         <form action="/buy.html" method="GET" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">

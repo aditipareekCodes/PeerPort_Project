@@ -120,13 +120,24 @@
             <p>Resale Platform For Students</p>
         </div>
         <div class="user-controls">
-            <span class="welcome-text">Welcome, <strong>{{ user_name }}</strong></span>
-            
-            <a href="/settings.html" style="color: #ccc; text-decoration: none; font-size: 22px; transition: transform 0.3s ease, color 0.3s ease; display: inline-block;" onmouseover="this.style.transform='rotate(45deg)'; this.style.color='#fdd835';" onmouseout="this.style.transform='rotate(0deg)'; this.style.color='#ccc';" title="Account Settings">
-                ⚙️
-            </a>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;">
+                    <span class="welcome-text">Welcome, <strong>{{ user_name }}</strong></span>
+                    {% if user and user.seller_rating %}
+                    <div style="font-size: 12px; color: #888; margin-top: 5px;">
+                        ⭐ Seller: <span style="color: #00e5ff; font-weight: bold;">{{ "%.1f"|format(user.seller_rating) }}</span>
+                        <span style="margin: 0 8px; color: #444;">|</span>
+                        ⭐ Buyer: <span style="color: #b000ff; font-weight: bold;">{{ "%.1f"|format(user.buyer_rating or 5.0) }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <a href="/settings.html" style="color: #ccc; text-decoration: none; font-size: 22px; transition: transform 0.3s ease, color 0.3s ease; display: inline-block;" onmouseover="this.style.transform='rotate(45deg)'; this.style.color='#fdd835';" onmouseout="this.style.transform='rotate(0deg)'; this.style.color='#ccc';" title="Account Settings">
+                    ⚙️
+                </a>
 
-            <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+                <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+            </div>
         </div>
     </nav>
 

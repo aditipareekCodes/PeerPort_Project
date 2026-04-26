@@ -217,8 +217,24 @@
                             <span style="color: #666;">☆</span>
                         {% endif %}
                     {% endfor %}
-                    <span style="font-size: 12px; color: #aaa; margin-left: 5px;">({{ item.seller_rating }})</span>
+                    <span style="font-size: 12px; color: #aaa; margin-left: 5px;">({{ item.seller_rating or 5.0 }})</span>
                 </div>
+                
+                {% if item.privacy_mode %}
+                <div style="font-size: 11px; color: #888; margin-top: 8px;">
+                    {% if item.privacy_mode == 'Email Only' %}
+                        <div style="padding: 8px; background: rgba(0, 229, 255, 0.05); border-radius: 4px; margin-top: 8px;">
+                            <strong>📧 Contact after deal approval:</strong><br>
+                            {{ item.seller_email or 'Not provided' }}
+                        </div>
+                    {% elif item.privacy_mode == 'Phone & Email' %}
+                        <div style="padding: 8px; background: rgba(0, 229, 255, 0.05); border-radius: 4px; margin-top: 8px;">
+                            <strong>📧 Email:</strong> {{ item.seller_email or 'Not provided' }}<br>
+                            <strong>📱 Phone:</strong> {{ item.seller_phone or 'Not provided' }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
         </div>
 

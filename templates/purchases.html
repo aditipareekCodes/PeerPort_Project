@@ -15,18 +15,18 @@
         .tab-btn.active { background: #00e5ff; color: #000; border-color: #00e5ff; }
         .tab-count { font-size: 12px; background: #333; padding: 2px 8px; border-radius: 12px; margin-left: 5px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; max-width: 1100px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1200px; margin: 0 auto; }
         
         .section-card { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .section-card h2 { font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #333; }
         
-        .deal-item { background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+        .deal-item { background: #111; border: 1px solid #222; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .deal-item:hover { border-color: #00e5ff; background: #161616; }
         
-        .item-img { width: 88px; height: 88px; border-radius: 8px; object-fit: cover; border: 1px solid #333; flex-shrink: 0; }
+        .item-img { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; border: 1px solid #333; flex-shrink: 0; }
         .item-info { flex-grow: 1; }
-        .item-title { font-size: 17px; font-weight: 600; color: #fff; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
-        .item-meta { font-size: 13px; color: #888; margin-bottom: 10px; }
+        .item-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+        .item-meta { font-size: 14px; color: #888; margin-bottom: 12px; }
         .price { color: #00e5ff; font-weight: bold; }
 
         .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: transparent; border: 1px solid #00e5ff; color: #00e5ff; text-transform: uppercase; }
@@ -88,6 +88,23 @@
                             <span class="status-badge">{{ deal.status }}</span>
                         </div>
                         <div class="item-meta">Seller: {{ deal.other_party }} | <span class="price">₹{{ deal.selling_price }}</span></div>
+                    
+                    {% if deal.other_rating %}
+                    <div style="font-size: 12px; margin: 8px 0;">
+                        ⭐ Buyer Rating: <strong>{{ "%.1f"|format(deal.other_rating) }}</strong> ({{ deal.other_rating_count or 1 }})
+                    </div>
+                    {% endif %}
+
+                    {% if deal.other_privacy and deal.status == 'Completed' %}
+                    <div style="font-size: 11px; background: rgba(0, 229, 255, 0.1); padding: 8px; border-radius: 4px; margin-top: 8px; border: 1px solid #333;">
+                        {% if deal.other_privacy == 'Email Only' %}
+                            <strong>📧 Email:</strong> {{ deal.other_email or 'Not provided' }}<br>
+                        {% elif deal.other_privacy == 'Phone & Email' %}
+                            <strong>📧 Email:</strong> {{ deal.other_email or 'Not provided' }}<br>
+                            <strong>📱 Phone:</strong> {{ deal.other_phone or 'Not provided' }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
                         
                         <div class="btn-group">
                             <a href="/chat/{{ deal.tx_id }}" class="action-btn btn-chat">Chat</a>
@@ -104,58 +121,85 @@
         </div>
 
         <div class="section-card">
-            <h2 style="color: #b000ff;">📦 Items I am Selling</h2>
-            {% for deal in selling %}
-                {% if deal.status != 'Completed' %}
+            <h2 style="color: #b000ff;">📦 My Sales & Listings</h2>
+            
+            <!-- Active Selling Deals -->
+            {% if selling %}
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333;">
+                <h3 style="color: #b000ff; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;">Active Sales</h3>
+                {% for deal in selling %}
+                    {% if deal.status != 'Completed' %}
+                    <div class="deal-item">
+                        <img src="{{ url_for('static', filename='uploads/' + deal.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
+                        <div class="item-info">
+                            <div class="item-title">
+                                {{ deal.title }} 
+                                <span class="status-badge" style="border-color:#b000ff; color:#b000ff;">{{ deal.status }}</span>
+                            </div>
+                            <div class="item-meta">Buyer: {{ deal.other_party }} | <span class="price" style="color:#b000ff;">₹{{ deal.selling_price }}</span></div>
+                            
+                            {% if deal.other_rating %}
+                            <div style="font-size: 12px; margin: 8px 0;">
+                                ⭐ Buyer Rating: <strong>{{ "%.1f"|format(deal.other_rating) }}</strong> ({{ deal.other_rating_count or 1 }})
+                            </div>
+                            {% endif %}
+
+                            {% if deal.other_privacy and deal.status == 'Completed' %}
+                            <div style="font-size: 11px; background: rgba(176, 0, 255, 0.1); padding: 8px; border-radius: 4px; margin-top: 8px; border: 1px solid #333;">
+                                {% if deal.other_privacy == 'Email Only' %}
+                                    <strong>📧 Email:</strong> {{ deal.other_email or 'Not provided' }}<br>
+                                {% elif deal.other_privacy == 'Phone & Email' %}
+                                    <strong>📧 Email:</strong> {{ deal.other_email or 'Not provided' }}<br>
+                                    <strong>📱 Phone:</strong> {{ deal.other_phone or 'Not provided' }}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="btn-group">
+                                <a href="/chat/{{ deal.tx_id }}" class="action-btn" style="background:#b000ff; color:white;">Chat</a>
+                                <form action="/complete_deal/{{ deal.tx_id }}" method="POST" style="margin:0;">
+                                    <button type="submit" class="action-btn btn-sold">Mark Sold</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Available Listings -->
+            <div>
+                <h3 style="color: #ffa500; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;">Available Listings</h3>
+                {% for listing in my_listings %}
                 <div class="deal-item">
-                    <img src="{{ url_for('static', filename='uploads/' + deal.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
+                    <img src="{{ url_for('static', filename='uploads/' + listing.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
                     <div class="item-info">
                         <div class="item-title">
-                            {{ deal.title }} 
-                            <span class="status-badge" style="border-color:#b000ff; color:#b000ff;">{{ deal.status }}</span>
+                            {{ listing.title }} 
+                            <span class="status-badge" style="border-color:#ffa500; color:#ffa500;">AVAILABLE</span>
                         </div>
-                        <div class="item-meta">Buyer: {{ deal.other_party }} | <span class="price" style="color:#b000ff;">₹{{ deal.selling_price }}</span></div>
+                        <div class="item-meta">
+                            <span class="price" style="color:#ffa500;">₹{{ listing.selling_price }}</span>
+                            {% if listing.original_price %}<span style="margin-left: 10px; text-decoration: line-through; color: #666;">₹{{ listing.original_price }}</span>{% endif %}
+                        </div>
                         
                         <div class="btn-group">
-                            <a href="/chat/{{ deal.tx_id }}" class="action-btn" style="background:#b000ff; color:white;">Chat</a>
-                            <form action="/complete_deal/{{ deal.tx_id }}" method="POST" style="margin:0;">
-                                <button type="submit" class="action-btn btn-sold">Mark Sold</button>
+                            <a href="/item/{{ listing.item_id }}" class="action-btn btn-view">View</a>
+                            <form action="/delete_listing/{{ listing.item_id }}" method="POST" onsubmit="return confirm('Delete this listing?');" style="margin:0;">
+                                <button type="submit" class="action-btn btn-delete">Delete</button>
                             </form>
                         </div>
                     </div>
                 </div>
-                {% endif %}
-            {% else %}
-            <div class="empty-state">No active sales.</div>
-            {% endfor %}
-        </div>
-
-        <div class="section-card">
-            <h2 style="color: #ffa500;">📋 My Listings</h2>
-            {% for listing in my_listings %}
-            <div class="deal-item">
-                <img src="{{ url_for('static', filename='uploads/' + listing.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
-                <div class="item-info">
-                    <div class="item-title">
-                        {{ listing.title }} 
-                        <span class="status-badge" style="border-color:#ffa500; color:#ffa500;">AVAILABLE</span>
-                    </div>
-                    <div class="item-meta">
-                        <span class="price" style="color:#ffa500;">₹{{ listing.selling_price }}</span>
-                        {% if listing.original_price %}<span style="margin-left: 10px; text-decoration: line-through; color: #666;">₹{{ listing.original_price }}</span>{% endif %}
-                    </div>
-                    
-                    <div class="btn-group">
-                        <a href="/item/{{ listing.item_id }}" class="action-btn btn-view">View</a>
-                        <form action="/delete_listing/{{ listing.item_id }}" method="POST" onsubmit="return confirm('Delete this listing?');" style="margin:0;">
-                            <button type="submit" class="action-btn btn-delete">Delete</button>
-                        </form>
-                    </div>
-                </div>
+                {% else %}
+                <div class="empty-state">No active listings yet.</div>
+                {% endfor %}
             </div>
-            {% else %}
-            <div class="empty-state">No active listings yet.</div>
-            {% endfor %}
+            
+            {% if not selling and not my_listings %}
+            <div class="empty-state">No active sales or listings.</div>
+            {% endif %}
         </div>
     </div>
 
@@ -169,6 +213,12 @@
                     <div class="completed-notice">✔ Transaction Completed</div>
                     <div class="item-title">{{ deal.title }}</div>
                     <div class="item-meta">Seller: <strong>{{ deal.other_party }}</strong> | <span class="price">₹{{ deal.selling_price }}</span></div>
+                    
+                    {% if deal.other_rating %}
+                    <div style="font-size: 12px; margin: 8px 0;">
+                        ⭐ Seller Rating: <strong>{{ "%.1f"|format(deal.other_rating) }}</strong> ({{ deal.other_rating_count or 1 }})
+                    </div>
+                    {% endif %}
                     
                     <div class="btn-group" style="margin-top: 12px;">
                         <button class="action-btn btn-rate" onclick="openRatingModal('seller-{{ deal.tx_id }}', '{{ deal.other_party }}', 'Seller')">⭐ Rate Seller</button>
@@ -186,6 +236,12 @@
         <h2 style="color: #b000ff;">📦 Items I've Sold</h2>
         {% if completed_selling|length > 0 %}
             {% for deal in completed_selling %}
+                    
+                    {% if deal.other_rating %}
+                    <div style="font-size: 12px; margin: 8px 0;">
+                        ⭐ Buyer Rating: <strong>{{ "%.1f"|format(deal.other_rating) }}</strong> ({{ deal.other_rating_count }})
+                    </div>
+                    {% endif %}
             <div class="deal-item completed-section">
                 <img src="{{ url_for('static', filename='uploads/' + deal.image_file.split(',')[0]) }}" class="item-img" onerror="this.src='/static/uploads/default_book.png'">
                 <div class="item-info">
@@ -203,7 +259,7 @@
         <div class="empty-state">No completed sales yet.<br><small>Complete a transaction to rate buyers</small></div>
         {% endif %}
     </div>
-
+<!--
     <div class="section-card">
         <h2 style="color: #ffa500;">📋 My Sold Listings</h2>
         {% if sold_listings %}
@@ -224,7 +280,7 @@
         <div class="empty-state">No sold listings yet.</div>
         {% endif %}
     </div>
-    </div>
+    </div>-->
 
 <!-- RATING MODAL -->
 <div id="ratingModal" class="modal">
