@@ -61,7 +61,9 @@ def init_db():
             privacy_mode TEXT DEFAULT 'Public',
             profile_pic TEXT DEFAULT 'default_avatar.png',
             seller_rating REAL DEFAULT 5.0,
-            rating_count INTEGER DEFAULT 1
+            rating_count INTEGER DEFAULT 1,
+            buyer_rating REAL DEFAULT 5.0,
+            buyer_rating_count INTEGER DEFAULT 1
         )
     ''')
     conn.execute('''
@@ -77,6 +79,8 @@ def init_db():
             semester TEXT,
             image_file TEXT,
             status TEXT DEFAULT 'Available',
+            product_rating REAL DEFAULT 5.0,
+            product_rating_count INTEGER DEFAULT 1,
             FOREIGN KEY (seller_id) REFERENCES users (moodle_id)
         )
     ''')
@@ -111,6 +115,19 @@ def init_db():
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS ratings (
+            rating_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tx_id INTEGER,
+            reviewer_id TEXT,
+            reviewed_id TEXT,
+            item_id INTEGER,
+            stars INTEGER,
+            comment TEXT,
+            FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
+    )
+    ''')
+                 
     conn.commit()
     conn.close()
 
@@ -557,8 +574,9 @@ def buy():
     search = request.args.get('search', '').strip().lower()
     cat = request.args.get('category', 'All')
     sem = request.args.get('semester', 'Any')
+    sort = request.args.get('sort', 'newest')
 
-    sql = "SELECT l.*, u.full_name as seller_name FROM listings l JOIN users u ON l.seller_id = u.moodle_id WHERE l.status = 'Available'"
+    sql = "SELECT l.*, u.full_name as seller_name, u.seller_rating as rating FROM listings l JOIN users u ON l.seller_id = u.moodle_id WHERE l.status = 'Available'"
     params = []
 
     if search:
@@ -571,10 +589,17 @@ def buy():
         sql += " AND l.semester = ?"
         params.append(sem)
 
+    if sort == 'newest':
+        sql += " ORDER BY l.item_id DESC"
+    elif sort == 'price':
+        sql += " ORDER BY l.selling_price ASC"
+    elif sort == 'discount':
+        sql += " ORDER BY CASE WHEN l.original_price > l.selling_price THEN (l.original_price - l.selling_price) / l.original_price ELSE 0 END DESC"
+
     conn = get_db_connection()
     items = conn.execute(sql, params).fetchall()
     conn.close()
-    return render_template('buy.html', items=items, current_category=cat, current_semester=sem)
+    return render_template('buy.html', items=items, current_category=cat, current_semester=sem, current_sort=sort)
 
 @app.route('/item/<int:item_id>')
 def view_item(item_id):
@@ -586,7 +611,33 @@ def view_item(item_id):
         (item_id,)
     ).fetchone()
     conn.close()
-    return render_template('item.html', item=item) if item else ("Not Found", 404)
+    return render_template('item.html', item=item, session_user_id=session.get('user_id')) if item else ("Not Found", 404)
+
+@app.route('/report_item/<int:item_id>', methods=['POST'])
+def report_item(item_id):
+    if 'user_id' not in session: return redirect('/login.html')
+    reason = request.form.get('reason')
+    if not reason: return "Invalid reason", 400
+    conn = get_db_connection()
+    user = conn.execute('SELECT full_name, email FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+    message = f"Report for item {item_id}: {reason}"
+    conn.execute('INSERT INTO contact_tickets (name, email, message) VALUES (?, ?, ?)', (user['full_name'], user['email'], message))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('view_item', item_id=item_id))
+
+@app.route('/delete_listing/<int:item_id>', methods=['POST'])
+def delete_listing(item_id):
+    if 'user_id' not in session: return redirect('/login.html')
+    conn = get_db_connection()
+    listing = conn.execute('SELECT seller_id FROM listings WHERE item_id = ?', (item_id,)).fetchone()
+    if str(listing['seller_id']) != str(session['user_id']):
+        conn.close()
+        return "Access Denied", 403
+    conn.execute('DELETE FROM listings WHERE item_id = ?', (item_id,))
+    conn.commit()
+    conn.close()
+    return redirect('/sell.html')
 
 # ==========================================
 # DEALS & CHAT
@@ -613,30 +664,138 @@ def request_item(item_id):
 @app.route('/purchases.html')
 def purchases():
     if 'user_id' not in session: return redirect('/login.html')
-    
     uid = str(session['user_id'])
     conn = get_db_connection()
 
-    # 🛒 ITEMS I AM BUYING (I am the buyer_id)
-    # We join with the SELLER'S name so the buyer knows who they are buying from
-    buying = conn.execute('''
-        SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status, u.full_name as other_party
+    buying_raw = conn.execute('''
+        SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status,
+               u.full_name as other_party, t.seller_id, t.item_id
         FROM transactions t
         JOIN listings l ON t.item_id = l.item_id
         JOIN users u ON t.seller_id = u.moodle_id
         WHERE t.buyer_id = ?''', (uid,)).fetchall()
 
-    # 📦 ITEMS I AM SELLING (I am the seller_id)
-    # We join with the BUYER'S name so the seller knows who wants to buy
-    selling = conn.execute('''
-        SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status, u.full_name as other_party
+    selling_raw = conn.execute('''
+        SELECT t.tx_id, l.title, l.selling_price, l.image_file, t.status,
+               u.full_name as other_party, t.buyer_id, t.item_id
         FROM transactions t
         JOIN listings l ON t.item_id = l.item_id
         JOIN users u ON t.buyer_id = u.moodle_id
         WHERE t.seller_id = ?''', (uid,)).fetchall()
 
+    # My available listings (not in any active transaction)
+    my_listings = conn.execute('''
+        SELECT * FROM listings 
+        WHERE seller_id = ? AND status = 'Available'
+        ORDER BY item_id DESC''', (uid,)).fetchall()
+
+    # My sold listings
+    sold_listings = conn.execute('''
+        SELECT * FROM listings 
+        WHERE seller_id = ? AND status = 'Sold'
+        ORDER BY item_id DESC''', (uid,)).fetchall()
+
+    # Which tx_ids has this user already rated
+    rated_txs = set(
+        row[0] for row in conn.execute(
+            'SELECT tx_id FROM ratings WHERE reviewer_id = ?', (uid,)
+        ).fetchall()
+    )
     conn.close()
-    return render_template('purchases.html', buying=buying, selling=selling)
+
+    buying = [dict(d) | {'rated': d['tx_id'] in rated_txs} for d in buying_raw]
+    selling = [dict(d) | {'rated': d['tx_id'] in rated_txs} for d in selling_raw]
+
+    completed_buying = [d for d in buying if d['status'] == 'Completed']
+    completed_selling = [d for d in selling if d['status'] == 'Completed']
+
+    # Debug prints
+    print(f"DEBUG: User {uid} - Buying deals: {len(buying)}")
+    for d in buying:
+        print(f"  Buying: {d['title']} - Status: {d['status']}")
+    print(f"DEBUG: Selling deals: {len(selling)}")
+    for d in selling:
+        print(f"  Selling: {d['title']} - Status: {d['status']}")
+    print(f"DEBUG: Completed buying: {len(completed_buying)}, Completed selling: {len(completed_selling)}")
+
+    return render_template('purchases.html',
+        buying=buying, selling=selling,
+        completed_buying=completed_buying,
+        completed_selling=completed_selling,
+        my_listings=my_listings,
+        sold_listings=sold_listings
+    )
+
+
+@app.route('/rate_deal/<int:tx_id>', methods=['POST'])
+def rate_deal(tx_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+
+    stars = int(request.form.get('rating', 0))
+    rating_type = request.form.get('type', '')
+    reviewer_id = str(session['user_id'])
+
+    if stars < 1 or stars > 5:
+        return jsonify({'success': False, 'message': 'Invalid rating'})
+
+    conn = get_db_connection()
+
+    deal = conn.execute(
+        'SELECT * FROM transactions WHERE tx_id = ? AND status = ?',
+        (tx_id, 'Completed')
+    ).fetchone()
+
+    if not deal:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Invalid transaction'})
+
+    # Decide who is being rated
+    if rating_type == 'seller':
+        reviewed_id = deal['seller_id']
+    elif rating_type == 'buyer':
+        reviewed_id = deal['buyer_id']
+    elif rating_type == 'product':
+        reviewed_id = deal['seller_id']
+    else:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Invalid type'})
+
+    # Prevent duplicate rating
+    existing = conn.execute(
+        'SELECT rating_id FROM ratings WHERE tx_id = ? AND reviewer_id = ? AND reviewed_id = ?',
+        (tx_id, reviewer_id, reviewed_id)
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Already rated'})
+
+    # Insert rating
+    conn.execute('''
+        INSERT INTO ratings (tx_id, reviewer_id, reviewed_id, item_id, stars, comment)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (tx_id, reviewer_id, reviewed_id, deal['item_id'], stars, rating_type))
+
+    # Recalculate average rating
+    ratings = conn.execute(
+        'SELECT stars FROM ratings WHERE reviewed_id = ?',
+        (reviewed_id,)
+    ).fetchall()
+
+    avg = sum(r['stars'] for r in ratings) / len(ratings)
+
+    conn.execute('''
+        UPDATE users
+        SET seller_rating = ?, rating_count = ?
+        WHERE moodle_id = ?
+    ''', (round(avg, 1), len(ratings), reviewed_id))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True})
+
 
 @app.route('/api/chat/<int:tx_id>')
 def api_chat(tx_id):
@@ -764,15 +923,6 @@ def about():
 @app.route('/faqs.html')
 def faqs():
     return render_template('faqs.html')
-
-@app.route('/delete_listing/<int:item_id>', methods=['POST'])
-def delete_listing(item_id):
-    if not session.get('is_admin'): return redirect('/login.html')
-    conn = get_db_connection()
-    conn.execute('DELETE FROM listings WHERE item_id = ?', (item_id,))
-    conn.commit()
-    conn.close()
-    return redirect('/admin_dashboard')
 
 @app.route('/delete_user/<moodle_id>', methods=['POST'])
 def delete_user(moodle_id):

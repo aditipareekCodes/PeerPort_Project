@@ -22,7 +22,6 @@
         .price-section { margin-bottom: 15px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
         .selling-price { color: #00e5ff; font-weight: bold; font-size: 22px; }
         .original-price { text-decoration: line-through; color: #666; font-size: 14px; }
-        .discount-tag { color: #00ff88; font-size: 13px; font-weight: bold; }
         
         .badge-container { margin-bottom: 20px; }
         .badge { background: #222; padding: 4px 10px; border-radius: 4px; font-size: 11px; color: #aaa; border: 1px solid #333; margin-right: 5px; text-transform: uppercase; }
@@ -47,13 +46,13 @@
             <div style="flex: 1; min-width: 120px;">
                 <select name="category" class="filter-input">
                     <option value="All" {% if current_category == 'All' %}selected{% endif %}>All Depts</option>
-                    <option value="ECE" {% if current_category == 'Humanities & Applied Sciences' %}selected{% endif %}>Humanities & Applied Sciences</option>
-                    <option value="IT" {% if current_category == 'IT' %}selected{% endif %}>IT</option>
-                    <option value="CS" {% if current_category == 'CS' %}selected{% endif %}>CS</option>
-                    <option value="Mech" {% if current_category == 'Mechanical' %}selected{% endif %}>Mechanical</option>
+                    <option value="Humanities & Applied Sciences" {% if current_category == 'Humanities & Applied Sciences' %}selected{% endif %}>Humanities & Applied Sciences</option>
+                    <option value="Information Technology" {% if current_category == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+                    <option value="Computer Science" {% if current_category == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+                    <option value="Mechanical" {% if current_category == 'Mechanical' %}selected{% endif %}>Mechanical</option>
                     <option value="Civil" {% if current_category == 'Civil' %}selected{% endif %}>Civil</option>
-                    <option value="General" {% if current_category == 'Data Science' %}selected{% endif %}>Data Science</option>
-                    <option value="Other" {% if current_category == 'Artificial Intelligence & Machine Learning' %}selected{% endif %}>Artificial Intelligence & Machine Learning</option>
+                    <option value="Data Science" {% if current_category == 'Data Science' %}selected{% endif %}>Data Science</option>
+                    <option value="Artificial Intelligence & Machine Learning" {% if current_category == 'Artificial Intelligence & Machine Learning' %}selected{% endif %}>Artificial Intelligence & Machine Learning</option>
                 </select>
             </div>
             <div style="flex: 1; min-width: 120px;">
@@ -62,6 +61,13 @@
                     {% for i in range(1, 9) %}
                     <option value="Sem {{i}}" {% if current_semester == 'Sem ' ~ i %}selected{% endif %}>Sem {{i}}</option>
                     {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 120px;">
+                <select name="sort" class="filter-input">
+                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price</option>
+                    <option value="discount" {% if current_sort == 'discount' %}selected{% endif %}>Discount</option>
                 </select>
             </div>
             <button type="submit" style="padding: 12px 25px; background: #00e5ff; color: black; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s;">APPLY</button>
@@ -78,20 +84,36 @@
      onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
             <h3 class="title">{{ item.title }}</h3>
 
+            <div class="seller-info" style="margin-bottom: 10px;">
+                <span style="font-size: 14px; color: #ccc;">Sold by: {{ item.seller_name }}</span>
+                <div class="rating" style="margin-top: 5px;">
+                    {% for i in range(5) %}
+                        {% if item.rating >= i+1 %}
+                            <span style="color: #ffd700;">★</span>
+                        {% elif item.rating > i %}
+                            <span style="color: #ffd700;">☆</span>
+                        {% else %}
+                            <span style="color: #666;">☆</span>
+                        {% endif %}
+                    {% endfor %}
+                    <span style="font-size: 12px; color: #aaa; margin-left: 5px;">({{ item.rating }})</span>
+                </div>
+            </div>
+
             <div class="price-section">
                 <span class="selling-price">₹{{ item.selling_price }}</span>
                 
                 {% if item.original_price and item.original_price|float > item.selling_price|float %}
                     <span class="original-price">₹{{ item.original_price }}</span>
-                    <span class="discount-tag">
-                        {{ (((item.original_price|float - item.selling_price|float) / item.original_price|float) * 100)|round|int }}% OFF
-                    </span>
                 {% endif %}
             </div>
 
             <div class="badge-container">
                 <span class="badge">{{ item.category }}</span>
                 <span class="badge">{{ item.semester }}</span>
+                {% if item.original_price and item.original_price|float > item.selling_price|float %}
+                <span class="badge" style="background: #00ff88; color: #000; border: 1px solid #00ff88;">{{ (((item.original_price|float - item.selling_price|float) / item.original_price|float) * 100)|round|int }}% OFF</span>
+                {% endif %}
             </div>
 
             <a href="/item/{{ item.item_id }}" class="btn">View Details</a>
