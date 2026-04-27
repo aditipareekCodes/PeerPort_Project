@@ -913,6 +913,84 @@ def settings():
         new_phone = request.form.get('phone')
         privacy = request.form.get('privacy_mode')
         file = request.files.get('profile_pic')
+        
+        # Handle password change
+        current_password = request.form.get('current_password', '').strip()
+        new_password = request.form.get('new_password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+        
+        password_changed = False
+        if current_password or new_password or confirm_password:
+            # If any password field is filled, all must be filled
+            if not current_password:
+                flash('❌ Please enter your current password to change it.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if not new_password:
+                flash('❌ Please enter a new password.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if not confirm_password:
+                flash('❌ Please confirm your new password.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            # Verify current password
+            user = conn.execute('SELECT password_hash FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+            if not bcrypt.check_password_hash(user['password_hash'], current_password):
+                flash('❌ Current password is incorrect.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            # Validate new password
+            if new_password != confirm_password:
+                flash('❌ New passwords do not match.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if len(new_password) < 8:
+                flash('❌ Password must be at least 8 characters.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if not re.search(r'[A-Z]', new_password):
+                flash('❌ Must contain at least one uppercase letter.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if not re.search(r'[a-z]', new_password):
+                flash('❌ Must contain at least one lowercase letter.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if not re.search(r'[0-9]', new_password):
+                flash('❌ Must contain at least one number.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            if not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password):
+                flash('❌ Must contain at least one special character.', 'danger')
+                user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
+                conn.close()
+                return render_template('settings.html', user=user_data)
+            
+            # Hash and update password
+            hashed_pw = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            conn.execute('UPDATE users SET password_hash = ? WHERE moodle_id = ?', (hashed_pw, session['user_id']))
+            password_changed = True
+        
+        # Update profile information
         if file and file.filename != '':
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -925,9 +1003,18 @@ def settings():
                 'UPDATE users SET full_name=?, phone=?, privacy_mode=? WHERE moodle_id=?',
                 (new_name, new_phone, privacy, session['user_id'])
             )
+        
         conn.commit()
         session['user_name'] = new_name
-        return redirect('/settings.html?success=true')
+        
+        # Success message
+        if password_changed:
+            flash('✅ Profile and password updated successfully!', 'success')
+        else:
+            flash('✅ Profile parameters updated successfully.', 'success')
+        
+        return redirect('/settings.html')
+    
     user_data = conn.execute('SELECT * FROM users WHERE moodle_id = ?', (session['user_id'],)).fetchone()
     conn.close()
     return render_template('settings.html', user=user_data)
