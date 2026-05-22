@@ -32,5 +32,5 @@ Follow these steps to deploy PeerPort on your local machine:
 
 1. **Clone the Repository**
    ```powershell
-   git clone [https://github.com/aditipareekCodes/PeerPort_Project.git](https://github.com/aditipareekCodes/PeerPort_Project.git)
-   cd PeerPort_Project
+    git clone https://github.com/aditipareekCodes/PeerPort_Project.git   
+    cd PeerPort_Project
