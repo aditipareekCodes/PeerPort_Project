@@ -26,8 +26,8 @@ bcrypt = Bcrypt(app)
 
 # --- Mail Configuration ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
@@ -38,7 +38,9 @@ DATABASE = 'peerport.db'
 # --- Database Connection ---
 def get_db_connection():
     # Connects to the SQLite relational database 
-    conn = sqlite3.connect('peerport.db')
+    conn = sqlite3.connect('peerport.db', timeout=30.0)
+    # Enable WAL mode for better concurrent access
+    conn.execute('PRAGMA journal_mode=WAL')
     # Critical: Allows accessing columns by name (e.g., row['email'])
     conn.row_factory = sqlite3.Row
     return conn
@@ -127,6 +129,17 @@ def init_db():
             FOREIGN KEY (tx_id) REFERENCES transactions(tx_id)
     )
     ''')
+    
+    # Add missing columns if they don't exist
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN buyer_rating REAL DEFAULT 5.0")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+    
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN buyer_rating_count INTEGER DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
                  
     conn.commit()
     conn.close()
@@ -338,6 +351,9 @@ def send_otp():
     session['otp_expiry'] = time.time() + 300
 
     try:
+        print("MAIL_USERNAME from getenv:", os.getenv('MAIL_USERNAME'))
+        print("MAIL_USERNAME from config:", app.config['MAIL_USERNAME'])
+        print("MAIL_PASSWORD:", app.config['MAIL_PASSWORD'][:4] + "****")  # partial
         msg = Message(
             subject='PeerPort OTP',
             recipients=[email]
@@ -346,23 +362,14 @@ def send_otp():
 
 Welcome to PeerPort — the official student marketplace for APSIT.
 
-You are receiving this email because someone used this address
-to register a new PeerPort account. To complete your registration,
-please verify your identity using the OTP below.
-
+You are receiving this email because someone used this address to register a new PeerPort account. To complete your registration, please verify your identity using the OTP below.
 Your verification OTP is:
 
         {otp}
 
-This code is valid for 5 minutes only. Enter it on the
-registration page to activate your account.
-
-Please do not share this OTP with anyone — PeerPort staff
-will never ask for your verification code.
-
-If you did not attempt to register on PeerPort, please
-ignore this email. No account will be created without
-entering this code.
+This code is valid for 5 minutes only. Enter it on the registration page to activate your account.
+Please do not share this OTP with anyone 
+If you did not attempt to register on PeerPort, please ignore this email. No account will be created without entering this code.
 
 — The PeerPort Team
 Built exclusively for APSIT students
@@ -441,20 +448,13 @@ def forgot_password():
                 )
                 msg.body = f"""Hello {user['full_name']},
 
-We received a request to reset the password for your PeerPort account
-associated with this email: {email}
-
+We received a request to reset the password for your PeerPort account associated with this email: {email}
 Your password reset OTP is:
 
         {otp}
 
-This code is valid for 15 minutes only. Please do not share it
-with anyone — PeerPort staff will never ask for your OTP.
-
-If you did not request a password reset, you can safely ignore
-this email. Your account remains secure and no changes have been made.
-
-Need help? Reach out to us through the Contact page on PeerPort.
+This code is valid for 15 minutes only. Please do not share it with anyone 
+If you did not request a password reset, you can safely ignore this email. Your account remains secure and no changes have been made.
 
 — The PeerPort Team
   Built exclusively for APSIT students."""
@@ -575,7 +575,6 @@ def buy():
     if 'user_id' not in session: return redirect('/login.html')
 
     search = request.args.get('search', '').strip().lower()
-    cat = request.args.get('category', 'All')
     sem = request.args.get('semester', 'Any')
     sort = request.args.get('sort', 'newest')
 
@@ -585,9 +584,6 @@ def buy():
     if search:
         sql += " AND LOWER(l.title) LIKE ?"
         params.append(f'%{search}%')
-    if cat != 'All':
-        sql += " AND l.category = ?"
-        params.append(cat)
     if sem != 'Any':
         sql += " AND l.semester = ?"
         params.append(sem)
@@ -602,7 +598,7 @@ def buy():
     conn = get_db_connection()
     items = conn.execute(sql, params).fetchall()
     conn.close()
-    return render_template('buy.html', items=items, current_category=cat, current_semester=sem, current_sort=sort)
+    return render_template('buy.html', items=items, current_semester=sem, current_sort=sort)
 
 @app.route('/item/<int:item_id>')
 def view_item(item_id):
@@ -804,11 +800,19 @@ def rate_deal(tx_id):
 
     avg = sum(r['stars'] for r in ratings) / len(ratings)
 
-    conn.execute('''
-        UPDATE users
-        SET seller_rating = ?, rating_count = ?
-        WHERE moodle_id = ?
-    ''', (round(avg, 1), len(ratings), reviewed_id))
+    # Update the appropriate rating column based on type
+    if rating_type == 'seller':
+        conn.execute('''
+            UPDATE users
+            SET seller_rating = ?, rating_count = ?
+            WHERE moodle_id = ?
+        ''', (round(avg, 1), len(ratings), reviewed_id))
+    elif rating_type == 'buyer':
+        conn.execute('''
+            UPDATE users
+            SET buyer_rating = ?, buyer_rating_count = ?
+            WHERE moodle_id = ?
+        ''', (round(avg, 1), len(ratings), reviewed_id))
 
     conn.commit()
     conn.close()
@@ -911,6 +915,8 @@ def settings():
     if request.method == 'POST':
         new_name = request.form.get('full_name')
         new_phone = request.form.get('phone')
+        new_department = request.form.get('department')
+        new_year = request.form.get('year')
         privacy = request.form.get('privacy_mode')
         file = request.files.get('profile_pic')
         
@@ -995,13 +1001,13 @@ def settings():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             conn.execute(
-                'UPDATE users SET full_name=?, phone=?, privacy_mode=?, profile_pic=? WHERE moodle_id=?',
-                (new_name, new_phone, privacy, filename, session['user_id'])
+                'UPDATE users SET full_name=?, phone=?, department=?, year=?, privacy_mode=?, profile_pic=? WHERE moodle_id=?',
+                (new_name, new_phone, new_department, new_year, privacy, filename, session['user_id'])
             )
         else:
             conn.execute(
-                'UPDATE users SET full_name=?, phone=?, privacy_mode=? WHERE moodle_id=?',
-                (new_name, new_phone, privacy, session['user_id'])
+                'UPDATE users SET full_name=?, phone=?, department=?, year=?, privacy_mode=? WHERE moodle_id=?',
+                (new_name, new_phone, new_department, new_year, privacy, session['user_id'])
             )
         
         conn.commit()

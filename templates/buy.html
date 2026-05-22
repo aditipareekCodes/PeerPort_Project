@@ -112,18 +112,6 @@ body::after {
                 <input type="text" name="search" class="filter-input" placeholder="Search assets (e.g. drafter)..." value="{{ search or '' }}">
             </div>
             <div style="flex: 1; min-width: 120px;">
-                <select name="category" class="filter-input">
-                    <option value="All" {% if current_category == 'All' %}selected{% endif %}>All Depts</option>
-                    <option value="Humanities & Applied Sciences" {% if current_category == 'Humanities & Applied Sciences' %}selected{% endif %}>Humanities & Applied Sciences</option>
-                    <option value="Information Technology" {% if current_category == 'Information Technology' %}selected{% endif %}>Information Technology</option>
-                    <option value="Computer Science" {% if current_category == 'Computer Science' %}selected{% endif %}>Computer Science</option>
-                    <option value="Mechanical" {% if current_category == 'Mechanical' %}selected{% endif %}>Mechanical</option>
-                    <option value="Civil" {% if current_category == 'Civil' %}selected{% endif %}>Civil</option>
-                    <option value="Data Science" {% if current_category == 'Data Science' %}selected{% endif %}>Data Science</option>
-                    <option value="Artificial Intelligence & Machine Learning" {% if current_category == 'Artificial Intelligence & Machine Learning' %}selected{% endif %}>Artificial Intelligence & Machine Learning</option>
-                </select>
-            </div>
-            <div style="flex: 1; min-width: 120px;">
                 <select name="semester" class="filter-input">
                     <option value="Any" {% if current_semester == 'Any' %}selected{% endif %}>Any Sem</option>
                     {% for i in range(1, 9) %}
@@ -177,7 +165,6 @@ body::after {
             </div>
 
             <div class="badge-container">
-                <span class="badge">{{ item.category }}</span>
                 <span class="badge">{{ item.semester }}</span>
                 {% if item.original_price and item.original_price|float > item.selling_price|float %}
                 <span class="badge" style="background: #00ff88; color: #000; border: 1px solid #00ff88;">{{ (((item.original_price|float - item.selling_price|float) / item.original_price|float) * 100)|round|int }}% OFF</span>
