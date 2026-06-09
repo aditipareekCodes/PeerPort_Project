@@ -1,36 +1,266 @@
 # PeerPort 🌐
 
-### *An Exclusive, Intra-Campus Peer-to-Peer Academic Resource Marketplace*
+### A Secure Intra-Campus Academic Marketplace for APSIT Students
 
-PeerPort is a dynamic full-stack web application designed exclusively for college campuses. It streamlines the student-to-student exchange of academic essentials like reference books, engineering tools (drafters, aprons, component kits), and study materials, creating a trusted, localized circular economy.
+PeerPort is a full-stack web application designed exclusively for students of APSIT. The platform enables students to buy, sell, and exchange academic resources such as textbooks, engineering tools, lab equipment, component kits, and study materials within a trusted campus community.
 
----
-
-## 🚀 Key Features
-
-* **Official College Email Authentication**: Restricts platform access exclusively to verified students using `@apsit.edu.in` institutional domains.
-* **Dual-Phase Secure Registration**: Integrates mandatory 8-digit Moodle ID verification alongside phone tracking and simulated OTP confirmation via college email.
-* **Strict Security & Access Policies**: Implements industrial-grade password hashing via `Flask-Bcrypt` with a robust validation policy (uppercase, lowercase, digits, special characters).
-* **Vibrant User Experience**: Transitions away from monochrome dark elements into a high-fidelity dashboard customized with rich web graphics and academic filters.
-* **User Privacy Protection**: Automatically processes academic profiles (Year, Semester, Department) for high-precision smart-matching while masking sensitive user contact data from public listings.
+By restricting access to verified college accounts, PeerPort creates a secure and localized marketplace that encourages resource sharing while reducing academic expenses.
 
 ---
 
-## 🛠️ Technical Stack
+## 🚀 Features
 
-* **Frontend**: HTML5, CSS3 (Custom Layout Framework), JavaScript (ES6+), SVG Media.
-* **Backend**: Python (Flask Framework) handles session management, structural validation, and server-side logic.
-* **Database**: Relational SQLite architecture configured for localized execution (Production scalable to PostgreSQL).
-* **Security**: Bcrypt cryptographic hashing, Regex domain validation, and secure Flask-Session routing.
-* **Production Engine**: Gunicorn WSGI HTTP Server optimized for live hosting environments.
+### 🔐 Secure Student Authentication
+
+* Access restricted to verified `@apsit.edu.in` email addresses.
+* Dual-phase registration process with Moodle ID verification.
+* Simulated OTP verification through institutional email workflow.
+* Session-based authentication and access control.
+
+### 👤 User Profile Management
+
+* Personalized student profiles.
+* Academic information tracking:
+
+  * Department
+  * Year
+  * Semester
+* Profile picture management.
+* Contact privacy protection.
+
+### 🛒 Marketplace Functionality
+
+* Create academic product listings.
+* Browse available resources.
+* View detailed product information.
+* Academic category-based filtering.
+* Buyer-seller interaction support.
+
+### 🔒 Security Features
+
+* Password hashing using Flask-Bcrypt.
+* Strong password validation:
+
+  * Uppercase letters
+  * Lowercase letters
+  * Numbers
+  * Special characters
+* Secure session handling.
+* Institutional email validation.
+
+### 🎨 User Experience
+
+* Responsive dashboard design.
+* Custom-built frontend interface.
+* Dynamic JavaScript interactions.
+* Academic-focused user workflow.
 
 ---
 
-## ⚙️ Local Installation & Setup
+## 🛠️ Tech Stack
 
-Follow these steps to deploy PeerPort on your local machine:
+### Frontend
 
-1. **Clone the Repository**
-   ```powershell
-    git clone https://github.com/aditipareekCodes/PeerPort_Project.git   
-    cd PeerPort_Project
+* HTML5
+* CSS3
+* JavaScript (ES6+)
+* SVG Assets
+
+### Backend
+
+* Python
+* Flask
+
+### Database
+
+* SQLite
+
+### Security
+
+* Flask-Bcrypt
+* Regex Validation
+* Flask Sessions
+
+### Deployment
+
+* Gunicorn WSGI Server
+
+---
+
+## 📂 Project Structure
+
+```text
+PeerPort_Project/
+│
+├── static/
+│   ├── css/
+│   ├── js/
+│   └── images/
+│
+├── templates/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+│
+├── update_users.py
+├── update_pfp.py
+├── update_desc.py
+├── update_ratings.py
+│
+├── update_tx.py
+├── force_tx.py
+├── check_deals.py
+│
+└── database utilities
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/aditipareekCodes/PeerPort_Project.git
+cd PeerPort_Project
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Activate:
+
+**Windows**
+
+```bash
+venv\Scripts\activate
+```
+
+**Linux / MacOS**
+
+```bash
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run Application
+
+```bash
+python app.py
+```
+
+### 5. Open Browser
+
+```text
+http://127.0.0.1:5000
+```
+
+---
+
+## 📸 Application Screenshots
+
+### Login Page
+
+![alt text](docs/login.png)
+
+### Registration Page
+
+![alt text](docs/registration.png)
+
+### Product Listing Page
+
+![alt text](docs/buy_item.png)
+
+### Product selling Page 
+
+![alt text](docs/sell_item.png)
+---
+
+### Check more pages 
+
+/workspaces/PeerPort_Project/docs
+
+
+## 🗄️ Core Database Modules
+
+The application maintains structured data for:
+
+* Users
+* Academic Profiles
+* Product Listings
+* Transactions
+* Ratings
+* Contact Information
+
+SQLite is used for local development and can be migrated to PostgreSQL or MySQL for production-scale deployment.
+
+---
+
+## 💡 Concepts Demonstrated
+
+This project demonstrates practical implementation of:
+
+* Full-Stack Web Development
+* Authentication & Authorization
+* Password Hashing
+* Session Management
+* Form Validation
+* CRUD Operations
+* Relational Databases
+* Frontend Development
+* Backend API Logic
+* Secure User Workflows
+* Git & GitHub Version Control
+
+---
+
+## 🧩 Challenges Solved
+
+* Restricting platform access exclusively to verified college students.
+* Designing a secure registration workflow.
+* Protecting user privacy while enabling communication between students.
+* Managing academic profile matching and listing visibility.
+* Maintaining secure password storage practices.
+
+---
+
+## 🔮 Future Improvements
+
+* Real Email OTP Integration
+* Real-Time Chat System
+* Product Recommendation Engine
+* Advanced Search & Filtering
+* Image Upload Optimization
+* PostgreSQL Migration
+* Mobile Application Support
+* Admin Moderation Dashboard
+* Transaction History Analytics
+
+---
+
+## 👩‍💻 Author
+
+**Aditi Pareek**
+
+* Full Stack Developer
+* APSIT Student
+
+GitHub:
+https://github.com/aditipareekCodes
+
+---
+
+## 📜 License
+
+This project is developed for educational and portfolio purposes.
+
+Feel free to fork, learn from, and build upon the project.
