@@ -90,7 +90,12 @@ By restricting access to verified college accounts, PeerPort creates a secure an
 ## 📂 Project Structure
 
 ```text
-PeerPort_Project/
+project/
+│
+├── app.py                 # Main Flask application
+├── requirements.txt
+├── README.md
+├── .gitignore
 │
 ├── static/
 │   ├── css/
@@ -98,21 +103,37 @@ PeerPort_Project/
 │   └── images/
 │
 ├── templates/
+│   ├── index.html
+│   ├── login.html
+│   └── profile.html
 │
-├── app.py
-├── requirements.txt
-├── README.md
+├── database/
+│   ├── update_db.py
+│   ├── reset_db.py
+│   ├── restore.py
+│   └── fix_db.py
 │
-├── update_users.py
-├── update_pfp.py
-├── update_desc.py
-├── update_ratings.py
+├── users/
+│   ├── update_users.py
+│   ├── update_pfp.py
+│   ├── update_ratings.py
+│   └── update_desc.py
 │
-├── update_tx.py
-├── force_tx.py
-├── check_deals.py
+├── transactions/
+│   ├── update_tx.py
+│   ├── force_tx.py
+│   └── check_deals.py
 │
-└── database utilities
+├── testing/
+│   └── test_email.py
+│
+├── scripts/
+│   ├── add_contact_db.py
+│   ├── reset.py
+│   └── nuke.py
+│
+└── docs/
+    └── screenshots/
 ```
 
 ---
@@ -185,9 +206,9 @@ http://127.0.0.1:5000
 ![alt text](docs/sell_item.png)
 ---
 
-### Check more pages 
+### 📄 Check More Pages
 
-/workspaces/PeerPort_Project/docs
+[View All Screenshots & Documentation](./docs)
 
 
 ## 🗄️ Core Database Modules
